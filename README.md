@@ -83,6 +83,9 @@ cd ~/Work/Dev
 ./install.sh
 
 # 2. (Optional) Customize CLIs & models per role
+#    - Default mixed preset: .team/agents.example.json (copied automatically by install.sh)
+#    - Claude Code-only preset:
+cp .team/agents.claude-only.json .team/agents.json
 nano .team/agents.json
 
 # 3. Bind your target project directory (creates template if new)
@@ -123,7 +126,8 @@ dev web stop | log       # Stop WebUI or tail server logs
 ├── .agents/roles/              # Per-role guidelines (controller..qa)
 └── .team/
     ├── TEAM.md                 # Team workflow, state machine & protocols
-    ├── agents.example.json     # Customizable CLI/model mapping template
+    ├── agents.example.json     # Mixed CLI/model mapping template (agy + pi)
+    ├── agents.claude-only.json # Claude Code-only preset for all 8 roles
     ├── memory/                 # SQLite Vector + FTS5 + Graph RAG (schema, indexer, search)
     ├── projects/template/      # Template for new project spaces
     ├── scripts/                # session_manager.py, switch-project.sh, team_hub.py, memory wrappers

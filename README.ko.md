@@ -84,6 +84,9 @@ cd ~/Work/Dev
 ./install.sh
 
 # 2. (선택) 역할별 CLI 및 모델 커스터마이즈
+#    - 기본 혼합 프리셋: .team/agents.example.json (install.sh가 자동 복사)
+#    - Claude Code 단독 프리셋 사용 시:
+cp .team/agents.claude-only.json .team/agents.json
 nano .team/agents.json
 
 # 3. 대상 프로젝트 연결 (신규 경로면 템플릿 자동 생성)

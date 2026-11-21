@@ -1,0 +1,60 @@
+{
+  "roles": {
+    "controller": {
+      "tab_label": "Dev1",
+      "group": "Dev1 (Planning)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    },
+    "planner": {
+      "tab_label": "Dev1",
+      "group": "Dev1 (Planning)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    },
+    "architector": {
+      "tab_label": "Dev2",
+      "group": "Dev2 (Design)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    },
+    "designer": {
+      "tab_label": "Dev2",
+      "group": "Dev2 (Design)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    },
+    "frontend": {
+      "tab_label": "Dev3",
+      "group": "Dev3 (Build)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    },
+    "backend": {
+      "tab_label": "Dev3",
+      "group": "Dev3 (Build)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    },
+    "reviewer": {
+      "tab_label": "Dev4",
+      "group": "Dev4 (Verify)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    },
+    "qa": {
+      "tab_label": "Dev4",
+      "group": "Dev4 (Verify)",
+      "agent_type": "claude",
+      "model": "Claude Code",
+      "base_cmd": "claude --dangerously-skip-permissions"
+    }
+  }
+}
