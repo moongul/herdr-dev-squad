@@ -1,0 +1,235 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dev — Herdr Multi-Agent Squad Control CLI
+#
+# Commands:
+#   dev up               Ensure Dev session is running with 4 tabs (2 panes each)
+#                        and start all 8 agents (with session resume).
+#   dev start | attach   Attach to the Herdr Dev session TUI (runs 'dev up' if needed).
+#   dev stop | down      Snapshot sessions and stop the Herdr Dev session.
+#   dev status           Display status of session, 4 tabs, and 8 agents.
+#   dev update           Check and update agent CLIs (agy, pi, herdr).
+#   dev switch <proj>    Switch active project with session snapshot & restore.
+#   dev hub              Open the Team Hub interactive dashboard.
+# ==============================================================================
+
+set -e
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+DEV_ROOT="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+# 만약 DEV_ROOT가 .local/bin 등이면 $HOME/Work/Dev(또는 DEV_HOME)로 폴백
+if [ ! -d "${DEV_ROOT}/.team" ]; then
+    DEV_ROOT="${DEV_HOME:-$HOME/Work/Dev}"
+fi
+
+TEAM_DIR="${DEV_ROOT}/.team"
+SCRIPTS_DIR="${TEAM_DIR}/scripts"
+SESSION_MGR="${SCRIPTS_DIR}/session_manager.py"
+SWITCH_SCRIPT="${SCRIPTS_DIR}/switch-project.sh"
+HUB_SCRIPT="${SCRIPTS_DIR}/team_hub.py"
+WEB_SERVER="${TEAM_DIR}/web/server.py"
+ACTIVE_FILE="${TEAM_DIR}/active_project"
+HERDR_SESSION="Dev"
+
+# Agent 실행 옵션 (Frontend/Backend: Agy Gemini 4 Hydrogen | Architect/Reviewer/QA: Pi)
+SKIP_UPDATE="${DEV_SKIP_UPDATE:-0}"
+ARGS=()
+for arg in "$@"; do
+    if [ "$arg" = "--no-update" ]; then
+        SKIP_UPDATE=1
+    else
+        ARGS+=("$arg")
+    fi
+done
+set -- "${ARGS[@]}"
+
+update_agent_clis() {
+    local mode="${1:-prestart}"
+    if [ "$SKIP_UPDATE" = "1" ] && [ "$mode" != "manual" ]; then
+        echo "[*] Skipping CLI update check (--no-update / DEV_SKIP_UPDATE=1)."
+        return 0
+    fi
+
+    echo "[*] Checking for Agent CLI updates (agy, pi, herdr)..."
+
+    if command -v agy >/dev/null 2>&1; then
+        echo "  -> Checking agy..."
+        timeout 45 agy update || echo "  [!] agy update skipped or timed out (continuing)."
+    fi
+
+    if command -v pi >/dev/null 2>&1; then
+        echo "  -> Checking pi..."
+        timeout 45 pi update --self || echo "  [!] pi update skipped or timed out (continuing)."
+    fi
+
+    if command -v herdr >/dev/null 2>&1; then
+        if ! herdr --session "${HERDR_SESSION}" status server 2>&1 | grep -q "status: running"; then
+            echo "  -> Checking herdr..."
+            timeout 45 herdr update || echo "  [!] herdr update skipped or timed out (continuing)."
+        elif [ "$mode" = "manual" ]; then
+            echo "  -> Checking herdr (live handoff)..."
+            timeout 45 herdr update --handoff || echo "  [!] herdr update skipped or timed out (continuing)."
+        fi
+    fi
+}
+
+cmd="${1:-start}"
+
+case "$cmd" in
+    up)
+        echo "=================================================="
+        echo "🚀 Initializing Dev Squad (4 Tabs × 2 Panes Layout)"
+        echo "   [Frontend/Backend: Agy (Gemini 4 Hydrogen) | Architect/Reviewer/QA: Pi]"
+        echo "=================================================="
+        update_agent_clis prestart
+        python3 "${SESSION_MGR}" up
+        echo ""
+        echo "✅ Dev squad is ready! Run 'dev start' to attach."
+        ;;
+
+    start|attach)
+        # 세션 서버가 실행 중이 아니거나 역할 패인이 없으면 먼저 dev up 실행
+        if ! herdr --session "${HERDR_SESSION}" status server 2>&1 | grep -q "status: running"; then
+            echo "[*] Session '${HERDR_SESSION}' is stopped. Starting squad (Frontend/Backend: Agy | Architect/Reviewer/QA: Pi)..."
+            update_agent_clis prestart
+            python3 "${SESSION_MGR}" up
+        else
+            # 패인 수 확인
+            ROLE_COUNT=$(python3 -c "
+import subprocess, json
+try:
+    res = subprocess.run(['herdr', '--session', 'Dev', 'pane', 'list'], capture_output=True, text=True)
+    panes = json.loads(res.stdout).get('result', {}).get('panes', [])
+    roles = {'controller', 'planner', 'architector', 'designer', 'frontend', 'backend', 'reviewer', 'qa'}
+    found = sum(1 for p in panes if p.get('label') in roles)
+    print(found)
+except:
+    print(0)
+")
+            if [ "$ROLE_COUNT" -lt 8 ]; then
+                echo "[*] Role panes are incomplete (${ROLE_COUNT}/8). Setting up layout..."
+                update_agent_clis prestart
+                python3 "${SESSION_MGR}" up
+            fi
+        fi
+
+        echo "[*] Attaching to Herdr session '${HERDR_SESSION}'..."
+        exec herdr session attach "${HERDR_SESSION}"
+        ;;
+
+    update)
+        echo "=================================================="
+        echo "🔄 Updating Agent CLIs"
+        echo "=================================================="
+        update_agent_clis manual
+        echo "✅ Agent CLI update check completed."
+        ;;
+
+    stop|down)
+        echo "[*] Saving snapshots and stopping Herdr session '${HERDR_SESSION}'..."
+        python3 "${SESSION_MGR}" snapshot
+        herdr --session "${HERDR_SESSION}" server stop || true
+        echo "🛑 Session '${HERDR_SESSION}' stopped safely."
+        ;;
+
+    status)
+        echo "=================================================="
+        echo "📊 Dev Multi-Agent Squad Status"
+        echo "=================================================="
+        python3 "${SESSION_MGR}" status
+        echo "=================================================="
+        ;;
+
+    switch)
+        shift
+        "${SWITCH_SCRIPT}" "$@"
+        ;;
+
+    hub)
+        python3 "${HUB_SCRIPT}"
+        ;;
+
+    web|ui)
+        WEB_PORT="${2:-8080}"
+        PID_FILE="${TEAM_DIR}/web/server.pid"
+        LOG_FILE="${TEAM_DIR}/web/server.log"
+
+        if [ "$2" = "stop" ]; then
+            if [ -f "$PID_FILE" ]; then
+                PID=$(cat "$PID_FILE")
+                if kill -0 "$PID" 2>/dev/null; then
+                    kill "$PID" || true
+                    echo "🛑 Command Deck WebUI stopped (PID $PID)."
+                fi
+                rm -f "$PID_FILE"
+            else
+                pkill -f "python3.*${WEB_SERVER}" || true
+                echo "🛑 Command Deck WebUI stopped."
+            fi
+            exit 0
+        fi
+
+        if [ "$2" = "log" ] || [ "$2" = "logs" ]; then
+            touch "$LOG_FILE"
+            tail -f "$LOG_FILE"
+            exit 0
+        fi
+
+        # Check if already running
+        if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+            echo "🌐 Command Deck WebUI is already running at http://localhost:${WEB_PORT}"
+            echo "   PID: $(cat "$PID_FILE") | Log: ${LOG_FILE}"
+            exit 0
+        fi
+
+        echo "=================================================="
+        echo "🚀 Launching Herdr Swarm Command Deck WebUI..."
+        echo "=================================================="
+        setsid python3 -u "${WEB_SERVER}" "${WEB_PORT}" > "${LOG_FILE}" 2>&1 &
+        echo $! > "${PID_FILE}"
+        sleep 1.5
+
+        if kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+            echo "✅ Command Deck WebUI successfully started!"
+            echo "🔗 Web URL:  http://localhost:${WEB_PORT}"
+            echo "📁 Logs:     ${LOG_FILE}"
+            echo "💡 Tip:      'dev web stop' to stop, 'dev web log' to view logs"
+            echo "=================================================="
+        else
+            echo "❌ Failed to start WebUI. Check ${LOG_FILE} for details."
+            cat "${LOG_FILE}"
+            exit 1
+        fi
+        ;;
+
+    help|-h|--help)
+        echo "Usage: dev [command]"
+        echo ""
+        echo "Commands:"
+        echo "  dev up               Start Dev session & initialize 4 tabs (Dev1..Dev4) with 8 agents"
+        echo "  dev start            Attach to the Herdr Dev session (runs 'up' if not started)"
+        echo "  dev stop             Snapshot agent sessions and stop Herdr Dev session"
+        echo "  dev status           Show 4 tabs and 8 agents status"
+        echo "  dev update           Check and update agent CLIs (agy, pi, herdr)"
+        echo "  dev switch <project> Switch active project (e.g. 'dev switch claude')"
+        echo "  dev hub              Launch Team Hub interactive dashboard (TUI)"
+        echo "  dev web [port]       Launch Herdr Swarm Command Deck WebUI (default: 8080)"
+        echo "  dev web stop         Stop WebUI server"
+        echo "  dev web log          View WebUI live access/error logs"
+        echo ""
+        echo "Options:"
+        echo "  --no-update          Skip pre-start CLI update check (or set DEV_SKIP_UPDATE=1)"
+        ;;
+
+    *)
+        echo "Unknown command: $cmd"
+        echo "Run 'dev help' for usage."
+        exit 1
+        ;;
+esac

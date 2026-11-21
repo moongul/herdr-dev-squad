@@ -1,0 +1,35 @@
+# Personal / Runtime Project Data (keep only template)
+.team/projects/*
+!.team/projects/template/
+!.team/projects/template/**
+
+# Active project symlinks & pointer
+/PROJECT.md
+.team/TASKS.md
+.team/tasks
+.team/active_project
+.team/agents.json
+
+# SQLite Memory DB & WAL files
+.team/memory/memory.db
+.team/memory/memory.db-shm
+.team/memory/memory.db-wal
+
+# Runtime logs, backups & temp dirs
+.team/logs/
+.team/requests/
+.team/tasks_legacy_backup/
+.team/web/server.log
+.team/web/server.pid
+.team/web/*.png
+.playwright-cli/
+ref/
+test/
+
+# Dependencies & caches
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+*.swp

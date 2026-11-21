@@ -1,0 +1,60 @@
+{
+  "roles": {
+    "controller": {
+      "tab_label": "Dev1",
+      "group": "Dev1 (Planning)",
+      "agent_type": "agy",
+      "model": "Gemini 3.8 Flash",
+      "base_cmd": "agy --dangerously-skip-permissions --model gemini-3.8-flash"
+    },
+    "planner": {
+      "tab_label": "Dev1",
+      "group": "Dev1 (Planning)",
+      "agent_type": "agy",
+      "model": "Gemini 4 Neon",
+      "base_cmd": "agy --dangerously-skip-permissions --model gemini-4-neon-medium"
+    },
+    "architector": {
+      "tab_label": "Dev2",
+      "group": "Dev2 (Design)",
+      "agent_type": "pi",
+      "model": "Muse Spark 1.3 (pi)",
+      "base_cmd": "pi --model muse-spark-1.3-contributor"
+    },
+    "designer": {
+      "tab_label": "Dev2",
+      "group": "Dev2 (Design)",
+      "agent_type": "agy",
+      "model": "Gemini 4 Argon",
+      "base_cmd": "agy --dangerously-skip-permissions --model gemini-4-argon"
+    },
+    "frontend": {
+      "tab_label": "Dev3",
+      "group": "Dev3 (Build)",
+      "agent_type": "agy",
+      "model": "Gemini 4 Hydrogen",
+      "base_cmd": "agy --dangerously-skip-permissions --model gemini-4-hydrogen"
+    },
+    "backend": {
+      "tab_label": "Dev3",
+      "group": "Dev3 (Build)",
+      "agent_type": "agy",
+      "model": "Gemini 4 Hydrogen",
+      "base_cmd": "agy --dangerously-skip-permissions --model gemini-4-hydrogen"
+    },
+    "reviewer": {
+      "tab_label": "Dev4",
+      "group": "Dev4 (Verify)",
+      "agent_type": "pi",
+      "model": "Muse Spark 1.3 (pi)",
+      "base_cmd": "pi --model muse-spark-1.3-contributor"
+    },
+    "qa": {
+      "tab_label": "Dev4",
+      "group": "Dev4 (Verify)",
+      "agent_type": "pi",
+      "model": "Muse Spark 1.3 (pi)",
+      "base_cmd": "pi --model muse-spark-1.3-contributor"
+    }
+  }
+}

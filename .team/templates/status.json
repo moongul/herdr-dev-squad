@@ -1,0 +1,18 @@
+{
+  "task_id": "TASK-000-template",
+  "title": "템플릿 예시 — 실제 작업으로 사용하지 않음",
+  "status": "PENDING",
+  "owner": "Controller",
+  "reviewer": "Reviewer",
+  "qa_owner": "QA",
+  "created_at": "",
+  "updated_at": "",
+  "revision": 0,
+  "review_round": 0,
+  "pending_action": "Controller",
+  "dependencies": [],
+  "artifacts": [
+    "task.md",
+    "history.md"
+  ]
+}

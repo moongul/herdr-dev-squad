@@ -1,0 +1,3366 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HERDR SWARM // COMMAND DECK</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Fonts: Pretendard, Noto Sans KR, JetBrains Mono, Outfit -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Markdown & Code Highlight CDNs -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'Pretendard', '"Noto Sans KR"', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'Pretendard', '"Noto Sans KR"', 'monospace'],
+          },
+          colors: {
+            cyber: {
+              bg: '#080a12',
+              panel: '#0e1320',
+              card: '#141a29',
+              border: 'rgba(56, 189, 248, 0.16)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* CSS Root Theme Variables */
+    :root {
+      --bg-main: #07090e;
+      --bg-panel: rgba(14, 19, 32, 0.85);
+      --bg-card: rgba(20, 26, 41, 0.75);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(6, 182, 212, 0.35);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --canvas-bg: #090d16;
+      --canvas-grid: rgba(255, 255, 255, 0.04);
+      --canvas-link: rgba(56, 189, 248, 0.18);
+      --canvas-label: #f1f5f9;
+    }
+
+    html.light {
+      --bg-main: #f1f5f9;
+      --bg-panel: rgba(255, 255, 255, 0.95);
+      --bg-card: #ffffff;
+      --border-color: #cbd5e1;
+      --border-accent: rgba(14, 165, 233, 0.6);
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --canvas-bg: #f8fafc;
+      --canvas-grid: rgba(15, 23, 42, 0.06);
+      --canvas-link: rgba(14, 165, 233, 0.3);
+      --canvas-label: #0f172a;
+    }
+
+    body {
+      font-family: 'Outfit', 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      word-break: keep-all;
+      letter-spacing: -0.015em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .themed-panel {
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      transition: all 0.25s ease;
+    }
+
+    .themed-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+    .themed-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+    html.light .themed-card {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    html.light .themed-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.45);
+    }
+
+    /* Glowing pulse animation */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.04); }
+    }
+    .animate-pulse-glow {
+      animation: pulseGlow 2.4s ease-in-out infinite;
+    }
+
+    @keyframes livePing {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.2; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .live-indicator {
+      animation: livePing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    /* Working Agent Card Animations (Graph-node sparkle & pulse feel) */
+    @keyframes workingCardGlow {
+      0%, 100% {
+        border-color: rgba(16, 185, 129, 0.55);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.2), inset 0 0 8px rgba(16, 185, 129, 0.06);
+      }
+      50% {
+        border-color: rgba(52, 211, 153, 0.95);
+        box-shadow: 0 0 24px rgba(16, 185, 129, 0.5), 0 0 40px rgba(6, 182, 212, 0.18), inset 0 0 14px rgba(16, 185, 129, 0.14);
+      }
+    }
+    .agent-card-working {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.09) 0%, var(--bg-card) 55%, rgba(6, 182, 212, 0.06) 100%) !important;
+      animation: workingCardGlow 2s ease-in-out infinite;
+    }
+    html.light .agent-card-working {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, #ffffff 60%, rgba(6, 182, 212, 0.06) 100%) !important;
+    }
+
+    @keyframes scanlineSweep {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(250%); }
+    }
+    .working-scanline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 45%;
+      height: 2.5px;
+      background: linear-gradient(90deg, transparent, #10b981, #38bdf8, transparent);
+      animation: scanlineSweep 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      pointer-events: none;
+    }
+
+    @keyframes eqBounce {
+      0%, 100% { height: 4px; opacity: 0.5; }
+      50% { height: 13px; opacity: 1; }
+    }
+    .working-eq-bar {
+      width: 2.5px;
+      border-radius: 9999px;
+      background: linear-gradient(to top, #10b981, #38bdf8);
+      animation: eqBounce 0.9s ease-in-out infinite;
+    }
+    .working-eq-bar:nth-child(2) { animation-delay: 0.2s; }
+    .working-eq-bar:nth-child(3) { animation-delay: 0.4s; }
+
+    /* Markdown Typography & Rendering */
+    .markdown-content {
+      font-size: 12px;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+    .markdown-content h1 {
+      font-size: 15px;
+      font-weight: 800;
+      margin-top: 14px;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', 'Pretendard', 'Noto Sans KR', monospace;
+    }
+    html.light .markdown-content h1 {
+      border-color: rgba(0, 0, 0, 0.1);
+      color: #0284c7;
+    }
+    .markdown-content h2 {
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      color: #f1f5f9;
+      font-family: 'JetBrains Mono', 'Pretendard', 'Noto Sans KR', monospace;
+    }
+    html.light .markdown-content h2 { color: #0f172a; }
+    .markdown-content h3 {
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      color: #67e8f9;
+      font-family: 'JetBrains Mono', 'Pretendard', 'Noto Sans KR', monospace;
+    }
+    html.light .markdown-content h3 { color: #0891b2; }
+    .markdown-content p {
+      margin-bottom: 8px;
+    }
+    .markdown-content p:last-child {
+      margin-bottom: 0;
+    }
+    .markdown-content ul, .markdown-content ol {
+      margin-top: 4px;
+      margin-bottom: 8px;
+      padding-left: 20px;
+    }
+    .markdown-content ul { list-style-type: disc; }
+    .markdown-content ol { list-style-type: decimal; }
+    .markdown-content li {
+      margin-bottom: 3px;
+    }
+    .markdown-content strong {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+    html.light .markdown-content strong {
+      color: #0369a1;
+    }
+    .markdown-content blockquote {
+      border-left: 3px solid #06b6d4;
+      padding-left: 10px;
+      margin: 8px 0;
+      color: #94a3b8;
+      background: rgba(6, 182, 212, 0.05);
+      border-radius: 0 6px 6px 0;
+    }
+    .markdown-content hr {
+      border: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin: 12px 0;
+    }
+    html.light .markdown-content hr {
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    .markdown-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    html.light .markdown-content table {
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+    .markdown-content th {
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      font-weight: bold;
+      padding: 6px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    html.light .markdown-content th {
+      background: rgba(14, 165, 233, 0.1);
+      color: #0369a1;
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    .markdown-content td {
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    html.light .markdown-content td {
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    .markdown-content tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    html.light .markdown-content tr:nth-child(even) {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .markdown-content code:not(pre code) {
+      font-family: 'JetBrains Mono', 'Pretendard', 'Noto Sans KR', monospace;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.8);
+      color: #38bdf8;
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+    html.light .markdown-content code:not(pre code) {
+      background: #f1f5f9;
+      color: #0284c7;
+      border-color: #cbd5e1;
+    }
+    .markdown-content pre {
+      position: relative;
+      margin: 10px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #090d16 !important;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .markdown-content pre code {
+      display: block;
+      padding: 12px;
+      font-family: 'JetBrains Mono', 'Pretendard', 'Noto Sans KR', monospace;
+      font-size: 11px;
+      line-height: 1.5;
+      overflow-x: auto;
+    }
+    .copy-code-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: all 0.2s;
+    }
+    .copy-code-btn:hover {
+      opacity: 1;
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    /* Thought Accordion */
+    details.thought-accordion summary {
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    details.thought-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+    details.thought-accordion[open] .thought-chevron {
+      transform: rotate(90deg);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-sm select-none">
+
+  <!-- ==================== TOP NAVIGATION / SYSTEM STATUS BAR ==================== -->
+  <header class="sticky top-0 z-40 themed-panel border-b px-4 py-2.5 shadow-sm">
+    <div class="max-w-[1720px] mx-auto flex items-center justify-between gap-4">
+      
+      <!-- LOGO & ACTIVE SESSION BADGE -->
+      <div class="flex items-center gap-3.5 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
+            <i class="fa-solid fa-network-wired text-sm"></i>
+          </div>
+          <div>
+            <h1 class="text-sm font-extrabold tracking-wider font-mono bg-gradient-to-r from-cyan-500 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+              HERDR SWARM
+            </h1>
+            <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 leading-tight">
+              MULTI-AGENT COMMAND DECK
+            </div>
+          </div>
+        </div>
+
+        <div class="h-4 w-px bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+
+        <!-- Session & Project Badge -->
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 live-indicator"></span>
+            <span>SESSION: <strong id="session-id">Dev</strong></span>
+          </div>
+
+          <!-- Project Switcher Select -->
+          <div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-700 dark:text-purple-300">
+            <i class="fa-solid fa-folder-tree text-[11px]"></i>
+            <span class="text-[11px] font-semibold">PROJECT:</span>
+            <select id="project-select" onchange="handleProjectSwitch(this.value)" class="bg-transparent text-xs font-bold font-mono focus:outline-none cursor-pointer">
+              <option value="default" class="bg-slate-900 text-white">default</option>
+              <option value="claude" class="bg-slate-900 text-white">claude</option>
+              <option value="blog" class="bg-slate-900 text-white">blog</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- KNOWLEDGE & ENGINE STATUS -->
+      <div class="hidden xl:flex items-center gap-4 text-xs font-mono">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500 dark:text-slate-400">MEMORY DB:</span>
+          <span class="text-cyan-700 dark:text-cyan-300 font-bold"><i class="fa-solid fa-database text-[10px] mr-1"></i>SQLite + FTS5</span>
+        </div>
+        <div class="h-3 w-px bg-slate-300 dark:bg-slate-700"></div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500 dark:text-slate-400">SQUAD:</span>
+          <span class="text-emerald-600 dark:text-emerald-400 font-bold">8 Roles (Dev1~Dev4)</span>
+        </div>
+      </div>
+
+      <!-- PRIMARY CONTROLS & HIGH-VISIBILITY THEME SWITCHER -->
+      <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+        
+        <!-- PROMINENT THEME SWITCHER -->
+        <div class="flex items-center bg-slate-200 dark:bg-slate-900/90 p-1 rounded-xl border border-slate-300 dark:border-cyan-500/30 shadow-md flex-shrink-0" title="Toggle Theme (or press 'T')">
+          <button id="theme-btn-dark" onclick="setTheme('dark')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all shadow-sm">
+            <i class="fa-solid fa-moon text-cyan-400"></i>
+            <span>DARK</span>
+          </button>
+          <button id="theme-btn-light" onclick="setTheme('light')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all">
+            <i class="fa-solid fa-sun text-amber-500"></i>
+            <span>LIGHT</span>
+          </button>
+          <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-300 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono ml-1 hidden md:inline">key: T</span>
+        </div>
+
+        <!-- Live Refresh Pause/Resume -->
+        <button id="toggle-sim-btn" onclick="toggleLiveRefresh()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl themed-card text-xs font-mono font-semibold hover:border-cyan-500 transition-all shadow-sm flex-shrink-0">
+          <i id="sim-icon" class="fa-solid fa-play text-emerald-500"></i>
+          <span id="sim-text" class="text-slate-700 dark:text-slate-200">LIVE TICK</span>
+        </button>
+
+        <!-- Controller Direct Command Drawer Trigger -->
+        <button onclick="toggleControllerChat()" class="relative flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 dark:bg-cyan-950/90 dark:border dark:border-cyan-400/50 text-white dark:text-cyan-300 font-mono text-xs font-bold shadow-md transition-all flex-shrink-0">
+          <i class="fa-solid fa-terminal"></i>
+          <span>CONTROLLER IPC</span>
+          <span id="chat-badge-pulse" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        </button>
+
+        <!-- Manual Refresh Button -->
+        <button onclick="triggerManualSync()" title="수동 즉시 동기화" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-mono text-xs font-bold shadow-sm transition-all flex-shrink-0">
+          <i id="sync-icon" class="fa-solid fa-arrows-rotate"></i>
+          <span class="hidden sm:inline">SYNC</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+  <main class="flex-1 max-w-[1720px] w-full mx-auto p-4 space-y-4">
+
+    <!-- ==================== ROW 1: SYSTEM OVERVIEW METRICS ==================== -->
+    <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      <!-- Metric 1: Agents -->
+      <div class="themed-card p-3.5 rounded-xl border-l-4 border-l-cyan-500">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <span class="font-mono flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 live-indicator"></span>
+            <span>AGENTS ONLINE</span>
+          </span>
+          <i class="fa-solid fa-robot text-cyan-600 dark:text-cyan-400"></i>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="active-agent-count" class="text-2xl font-black font-mono text-slate-900 dark:text-white">8</span>
+          <span id="active-agent-status" class="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-semibold">0 Working / 8 Ready</span>
+        </div>
+        <div class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+          Coordinator: <strong class="text-cyan-700 dark:text-cyan-300 font-semibold">@controller (Dev1)</strong>
+        </div>
+      </div>
+
+      <!-- Metric 2: Global Task Progress -->
+      <div class="themed-card p-3.5 rounded-xl border-l-4 border-l-purple-500">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <span class="font-mono flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-purple-400 live-indicator"></span>
+            <span>TASK PIPELINE</span>
+          </span>
+          <i class="fa-solid fa-diagram-project text-purple-600 dark:text-purple-400"></i>
+        </div>
+        <div class="flex items-baseline justify-between">
+          <span id="task-pct" class="text-2xl font-black font-mono text-slate-900 dark:text-white">96%</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-mono"><strong id="task-completed-count" class="text-purple-700 dark:text-purple-300">81</strong> / <span id="task-total-count">84</span> Tasks</span>
+        </div>
+        <div class="mt-2 w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+          <div id="task-progress-bar" class="bg-gradient-to-r from-purple-500 to-cyan-500 h-1.5 rounded-full transition-all duration-500" style="width: 96%"></div>
+        </div>
+        <div id="task-breakdown" class="mt-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center justify-between">
+          <span>Queued: <b class="text-slate-700 dark:text-slate-300">2</b></span>
+          <span>Exec: <b class="text-cyan-500">1</b></span>
+          <span>Review: <b class="text-purple-400">0</b></span>
+          <span>Done: <b class="text-emerald-500">81</b></span>
+        </div>
+      </div>
+
+      <!-- Metric 3: Vector Chunks -->
+      <div class="themed-card p-3.5 rounded-xl border-l-4 border-l-emerald-500">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <span class="font-mono flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 live-indicator"></span>
+            <span>VECTOR CHUNKS</span>
+          </span>
+          <i class="fa-solid fa-cubes-stacked text-emerald-600 dark:text-emerald-400"></i>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="vector-count" class="text-2xl font-black font-mono text-slate-900 dark:text-white">1,958</span>
+          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-semibold">Indexed</span>
+          <span id="kpi-memory-queries" class="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-100 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 font-bold">0 queries</span>
+        </div>
+        <div id="kpi-memory-audit-agents" class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+          SQLite memory.db: <strong class="text-emerald-700 dark:text-emerald-300 font-semibold">task_chunks FTS5</strong>
+        </div>
+      </div>
+
+      <!-- Metric 4: Graph Knowledge Relations -->
+      <div class="themed-card p-3.5 rounded-xl border-l-4 border-l-amber-500">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <span class="font-mono flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 live-indicator"></span>
+            <span>GRAPH RELATIONS</span>
+          </span>
+          <i class="fa-solid fa-circle-nodes text-amber-600 dark:text-amber-400"></i>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="graph-entities" class="text-2xl font-black font-mono text-slate-900 dark:text-white">2,280</span>
+          <span class="text-xs text-amber-700 dark:text-amber-300 font-mono font-semibold">Live Links</span>
+        </div>
+        <div class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+          Entity Links: <strong class="text-amber-700 dark:text-amber-300 font-semibold">Task + Code Topology</strong>
+        </div>
+      </div>
+
+      <!-- Metric 5: Active Swarm Workspaces -->
+      <div class="themed-card p-3.5 rounded-xl border-l-4 border-l-rose-500 col-span-2 md:col-span-4 lg:col-span-1">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <span class="font-mono">HERDR TOPOLOGY</span>
+          <i class="fa-solid fa-network-wired text-rose-600 dark:text-rose-400"></i>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-black font-mono text-slate-900 dark:text-white">4 Tabs</span>
+          <span class="text-xs text-rose-600 dark:text-rose-400 font-mono font-semibold">2 Panes Each</span>
+        </div>
+        <div class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+          Layout: <strong class="text-rose-700 dark:text-rose-300 font-semibold">Dev1 · Dev2 · Dev3 · Dev4</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ROW 2: INTER-AGENT TOPOLOGY & DISPATCH MESH ==================== -->
+    <section class="themed-panel rounded-2xl p-4 shadow-sm relative overflow-hidden">
+      <!-- Section Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/5 mb-3 flex-wrap gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 live-indicator"></div>
+          <h2 class="text-sm font-bold tracking-wider font-mono text-slate-900 dark:text-white">HERDR INTER-AGENT TOPOLOGY & DISPATCH MESH</h2>
+          <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-mono font-semibold border border-cyan-500/30">
+            8 Roles Interactive
+          </span>
+        </div>
+
+        <!-- View Mode Switcher -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center bg-slate-200 dark:bg-slate-900 p-0.5 rounded-lg border border-slate-300 dark:border-white/10 text-xs font-mono">
+            <button id="view-topology-btn" onclick="setViewMode('topology')" class="px-2.5 py-1 rounded bg-white dark:bg-cyan-500/30 text-slate-900 dark:text-cyan-300 font-bold shadow-sm transition-all">
+              <i class="fa-solid fa-circle-nodes mr-1"></i> TOPOLOGY
+            </button>
+            <button id="view-cards-btn" onclick="setViewMode('cards')" class="px-2.5 py-1 rounded text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+              <i class="fa-solid fa-table-cells-large mr-1"></i> CARDS (8)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 1: Dynamic Canvas Topology Mesh -->
+      <div id="topology-view-wrapper" class="relative w-full h-[430px] bg-slate-100 dark:bg-slate-950/90 rounded-xl overflow-hidden border border-slate-200 dark:border-white/5 shadow-inner">
+        <canvas id="mesh-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-auto cursor-grab active:cursor-grabbing"></canvas>
+
+        <!-- Packet Info Tooltip -->
+        <div id="packet-tooltip" class="absolute z-30 pointer-events-none transition-opacity duration-200 opacity-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-2.5 rounded-xl border border-slate-300 dark:border-cyan-500/40 text-xs font-mono shadow-xl max-w-xs space-y-1">
+          <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-1">
+            <span id="tt-route" class="text-cyan-600 dark:text-cyan-400 font-bold"></span>
+            <span id="tt-type" class="text-purple-600 dark:text-purple-300 font-semibold"></span>
+          </div>
+          <div id="tt-payload" class="text-slate-900 dark:text-white text-[11px] font-semibold"></div>
+        </div>
+
+        <!-- Real-Time Packet Feed Overlay -->
+        <div class="absolute bottom-3 left-3 z-20 flex items-center gap-3 font-mono text-[11px] bg-white/90 dark:bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm pointer-events-none">
+          <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+            <i class="fa-solid fa-bolt text-[9px]"></i> HERDR IPC BUS
+          </span>
+          <span class="text-slate-400">|</span>
+          <span class="text-slate-600 dark:text-slate-300">Active Agents: <strong id="mesh-active-agents" class="text-cyan-600 dark:text-cyan-400">8</strong></span>
+          <span class="text-slate-400">|</span>
+          <span class="text-slate-500 text-[10px]">노드를 클릭하여 실시간 터미널 확인</span>
+        </div>
+      </div>
+
+      <!-- Mode 2: Swarm Agents Cards Grid (8 Agents) -->
+      <div id="agents-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- ==================== ROW 3: TASK KANBAN PIPELINE & LIVE ACTIVITY CONSOLE ==================== -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      
+      <!-- Column 1 & 2: Task Kanban Pipeline (2 cols) -->
+      <div class="lg:col-span-2 themed-panel rounded-2xl p-4 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/5 mb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-purple-600 dark:text-purple-400"></i>
+            <h3 class="text-xs font-bold font-mono tracking-wider text-slate-900 dark:text-white">PROJECT TASKS KANBAN</h3>
+            <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">(.team/TASKS.md)</span>
+          </div>
+          <span id="kanban-total-badge" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+            0 Tasks
+          </span>
+        </div>
+
+        <!-- 4-Stage Kanban Columns -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5 flex-1" id="kanban-container">
+          <!-- Column: Queued / PENDING -->
+          <div class="themed-card p-2.5 rounded-xl flex flex-col">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-white/5">
+              <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">PENDING</span>
+              <span id="badge-queued" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">0</span>
+            </div>
+            <div class="space-y-2 flex-1 overflow-y-auto max-h-64 pr-1" id="kanban-queued"></div>
+          </div>
+
+          <!-- Column: Executing / IN_PROGRESS -->
+          <div class="themed-card p-2.5 rounded-xl flex flex-col border-cyan-500/30">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-white/5">
+              <span class="text-xs font-bold font-mono text-cyan-700 dark:text-cyan-300">IN PROGRESS</span>
+              <span id="badge-exec" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400">0</span>
+            </div>
+            <div class="space-y-2 flex-1 overflow-y-auto max-h-64 pr-1" id="kanban-exec"></div>
+          </div>
+
+          <!-- Column: Review & QA -->
+          <div class="themed-card p-2.5 rounded-xl flex flex-col border-purple-500/30">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-white/5">
+              <span class="text-xs font-bold font-mono text-purple-700 dark:text-purple-300">REVIEW / QA</span>
+              <span id="badge-review" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400">0</span>
+            </div>
+            <div class="space-y-2 flex-1 overflow-y-auto max-h-64 pr-1" id="kanban-review"></div>
+          </div>
+
+          <!-- Column: Completed -->
+          <div class="themed-card p-2.5 rounded-xl flex flex-col border-emerald-500/30">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-white/5">
+              <span class="text-xs font-bold font-mono text-emerald-700 dark:text-emerald-300">COMPLETED</span>
+              <span id="badge-done" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">0</span>
+            </div>
+            <div class="space-y-2 flex-1 overflow-y-auto max-h-64 pr-1" id="kanban-done"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Live Swarm Activity Log Stream -->
+      <div class="themed-panel rounded-2xl p-4 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/5 mb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-terminal text-cyan-600 dark:text-cyan-400"></i>
+            <h3 class="text-xs font-bold font-mono tracking-wider text-slate-900 dark:text-white">SWARM EVENT LOG</h3>
+          </div>
+          <button onclick="clearActivityLogs()" class="text-[10px] font-mono text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">CLEAR</button>
+        </div>
+
+        <div id="terminal-stdout" class="flex-1 bg-slate-950 rounded-xl p-3 font-mono text-xs overflow-y-auto max-h-80 space-y-1.5 text-slate-300 shadow-inner">
+          <div class="text-slate-500 text-[10px]">// Herdr IPC Swarm Command Deck Initialized.</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== ROW 4: SHARED KNOWLEDGE MEMORY & GRAPH TOPOLOGY ==================== -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      
+      <!-- Col 1 & 2: Interactive Knowledge Graph Memory Visualizer -->
+      <div class="lg:col-span-2 themed-panel rounded-2xl p-4 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-white/5 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-nodes text-amber-500 text-sm"></i>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-xs font-bold font-mono tracking-wider text-slate-900 dark:text-white">SHARED GRAPH MEMORY TOPOLOGY</h3>
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              </div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">SQLite memory.db Entity-Relation live graph across Herdr agents</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="graph-memory-badge" class="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/20 font-mono font-bold">2,280 RELATIONS</span>
+            <button onclick="resetGraphPhysics()" title="그래프 재배치 (Re-cluster)" class="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-300 text-xs font-mono transition">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-500/10 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/20 font-mono font-bold">FORCE-DIRECTED 2D</span>
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="relative w-full h-[660px] bg-slate-100 dark:bg-slate-950/80 rounded-xl overflow-hidden border border-slate-300 dark:border-white/5 group shadow-inner">
+          <canvas id="graph-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+          <div class="absolute bottom-2 left-2 pointer-events-none flex items-center gap-2.5 text-[10px] font-mono text-slate-600 dark:text-slate-400 bg-white/90 dark:bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-white/10 shadow-sm backdrop-blur-sm">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> Session</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Agent</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Task</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Artifact</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Symbol/Entity</span>
+          </div>
+          <div class="absolute top-2 right-2 text-[10px] font-mono text-cyan-700 dark:text-cyan-400 bg-white/90 dark:bg-black/60 px-2.5 py-0.5 rounded-lg border border-cyan-300 dark:border-cyan-500/20 shadow-sm font-semibold">
+            DRAG NODES / HOVER
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 3: Vector Memory Stream & Controller Directives -->
+      <div class="space-y-4 flex flex-col">
+        <!-- Vector Memory Retrieval Stream -->
+        <div class="themed-panel rounded-2xl p-4 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-white/5">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-dna text-emerald-600 dark:text-emerald-400 text-sm"></i>
+              <div>
+                <h3 class="text-xs font-bold font-mono tracking-wider text-slate-900 dark:text-white">VECTOR MEMORY RAG STREAM</h3>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Recent SQLite task_chunks knowledge stream</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-500/20 font-bold" id="memory-total-badge">
+              1,958 Indexed
+            </span>
+          </div>
+          <!-- Agent Memory Usage Audit Bar -->
+          <div id="memory-agent-usage" class="mb-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 font-mono text-[10px]">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+              <span class="font-semibold text-slate-700 dark:text-slate-300"><i class="fa-solid fa-magnifying-glass-chart text-cyan-500 mr-1"></i>AGENT QUERY AUDIT</span>
+              <span id="memory-query-total" class="text-cyan-600 dark:text-cyan-400 font-bold">0 queries</span>
+            </div>
+            <div id="memory-agent-badges" class="flex flex-wrap gap-1">
+              <span class="text-slate-400">조회 이력 대기 중...</span>
+            </div>
+          </div>
+          <div id="vector-stream-list" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <div class="text-xs text-slate-500 font-mono py-2">Loading memory chunks...</div>
+          </div>
+        </div>
+
+        <!-- Controller Quick Directives -->
+        <div class="themed-panel rounded-2xl p-4 shadow-sm flex flex-col flex-1">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 dark:border-white/5">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-amber-500 text-sm"></i>
+              <h3 class="text-xs font-bold font-mono tracking-wider text-slate-900 dark:text-white">CONTROLLER DIRECTIVES</h3>
+            </div>
+            <span class="text-[10px] font-mono text-slate-500">Quick Actions</span>
+          </div>
+
+          <div class="space-y-1.5 flex-1 font-mono text-xs overflow-y-auto max-h-72 pr-1">
+            <button onclick="sendQuickDirective('현재 팀 8개 에이전트의 상태를 점검하고 요약해서 보고해줘.')" class="w-full text-left p-2 rounded-xl themed-card hover:border-cyan-500 text-slate-800 dark:text-slate-200 flex items-center justify-between group">
+              <span class="truncate text-[11px]">📊 8개 에이전트 상태 및 세션 점검</span>
+              <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-cyan-400 transition-colors"></i>
+            </button>
+
+            <button onclick="sendQuickDirective('현재 프로젝트의 진행 중인 태스크 현황과 블로커를 요약해줘.')" class="w-full text-left p-2 rounded-xl themed-card hover:border-cyan-500 text-slate-800 dark:text-slate-200 flex items-center justify-between group">
+              <span class="truncate text-[11px]">📋 진행 중 태스크 현황 및 블로커 요약</span>
+              <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-cyan-400 transition-colors"></i>
+            </button>
+
+            <button onclick="sendQuickDirective('Planner에게 다음 작업 요구사항 분석 및 WBS 수립을 요청해줘.')" class="w-full text-left p-2 rounded-xl themed-card hover:border-cyan-500 text-slate-800 dark:text-slate-200 flex items-center justify-between group">
+              <span class="truncate text-[11px]">🧠 Planner에게 WBS 기획 요청</span>
+              <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-cyan-400 transition-colors"></i>
+            </button>
+
+            <button onclick="sendQuickDirective('Architect에게 프론트-백엔드 간 API 계약 스펙(api-spec.md) 수립을 요청해줘.')" class="w-full text-left p-2 rounded-xl themed-card hover:border-cyan-500 text-slate-800 dark:text-slate-200 flex items-center justify-between group">
+              <span class="truncate text-[11px]">📐 Architect에게 API 계약 수립 요청</span>
+              <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-cyan-400 transition-colors"></i>
+            </button>
+
+            <button onclick="sendQuickDirective('Reviewer에게 최신 개발 산출물 코드 검토를 요청해줘.')" class="w-full text-left p-2 rounded-xl themed-card hover:border-cyan-500 text-slate-800 dark:text-slate-200 flex items-center justify-between group">
+              <span class="truncate text-[11px]">🔍 Reviewer에게 코드 검토 요청</span>
+              <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-cyan-400 transition-colors"></i>
+            </button>
+
+            <button onclick="sendQuickDirective('QA에게 E2E 브라우저 및 기능 검증을 요청해줘.')" class="w-full text-left p-2 rounded-xl themed-card hover:border-cyan-500 text-slate-800 dark:text-slate-200 flex items-center justify-between group">
+              <span class="truncate text-[11px]">🧪 QA에게 E2E 검증 요청</span>
+              <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-cyan-400 transition-colors"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== FLOATING CONTROLLER TRIGGER BUTTON ==================== -->
+  <button id="floating-chat-trigger" onclick="toggleControllerChat()" class="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-mono font-bold shadow-2xl transition-all transform hover:scale-105 border border-cyan-400/40">
+    <i class="fa-solid fa-terminal text-sm"></i>
+    <span>CONTROLLER CHAT</span>
+    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+  </button>
+
+  <!-- ==================== CONTROLLER INTERACTIVE COMMAND CONSOLE DRAWER ==================== -->
+  <div id="controller-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[560px] md:w-[620px] z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-l border-slate-300 dark:border-cyan-500/30 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
+    
+    <!-- Drawer Header -->
+    <div class="px-5 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between bg-slate-100/50 dark:bg-slate-950/50">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+          <i class="fa-solid fa-sitemap text-base"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-mono font-bold text-sm text-slate-900 dark:text-white">@controller CONSOLE</h3>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 live-indicator"></span>
+          </div>
+          <span class="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-semibold">Gemini 3.8 Flash · Dev1 (w4:p2)</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="fetchControllerHistory()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="대화 내역 동기화">
+          <i class="fa-solid fa-arrows-rotate text-xs"></i>
+        </button>
+        <button onclick="clearChatMessages()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="대화창 비우기">
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        </button>
+        <button onclick="toggleControllerChat()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Dialogue Feed -->
+    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3.5 font-mono text-xs select-text">
+      <!-- Initial System Banner -->
+      <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-300 space-y-1">
+        <div class="font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-info"></i> Herdr Controller IPC Connected
+        </div>
+        <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+          Controller 에이전트와 직접 상호작용합니다. 여기에 명령이나 요구사항을 입력하면 <strong>herdr agent prompt controller</strong>를 통해 작업이 전달되며, 실시간 생각과 실행 결과가 아래에 표시됩니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- Quick Directive Chips -->
+    <div class="px-4 py-2 bg-slate-100 dark:bg-slate-950/60 border-t border-slate-200 dark:border-white/5 flex items-center gap-1.5 overflow-x-auto text-[11px] font-mono no-scrollbar">
+      <span class="text-slate-400 text-[10px] flex-shrink-0">QUICK:</span>
+      <button onclick="sendQuickDirective('상태 점검')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:border-cyan-500 text-slate-700 dark:text-slate-300 whitespace-nowrap shadow-sm">
+        상태 점검
+      </button>
+      <button onclick="sendQuickDirective('태스크 요약')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:border-cyan-500 text-slate-700 dark:text-slate-300 whitespace-nowrap shadow-sm">
+        태스크 요약
+      </button>
+      <button onclick="sendQuickDirective('Planner 작업 위임')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:border-cyan-500 text-slate-700 dark:text-slate-300 whitespace-nowrap shadow-sm">
+        Planner 위임
+      </button>
+      <button onclick="sendQuickDirective('Reviewer 호출')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:border-cyan-500 text-slate-700 dark:text-slate-300 whitespace-nowrap shadow-sm">
+        Reviewer 호출
+      </button>
+    </div>
+
+    <!-- Chat Prompt Input Form -->
+    <div class="p-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950">
+      <form onsubmit="handleChatSubmit(event)" class="space-y-2">
+        <div class="relative">
+          <input id="chat-input" type="text" placeholder="Controller에게 지시할 작업 입력..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-cyan-500/40 rounded-xl px-4 py-3 text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-sm pr-12">
+          <button type="submit" id="chat-submit-btn" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center transition-colors">
+            <i class="fa-solid fa-arrow-up text-xs"></i>
+          </button>
+        </div>
+        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 px-1">
+          <span>Enter: 전송 · herdr agent prompt 통신</span>
+          <span class="text-emerald-500"><i class="fa-solid fa-circle-check text-[9px]"></i> Ready</span>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- ==================== AGENT DETAIL & LIVE TERMINAL MODAL ==================== -->
+  <div id="agent-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm hidden p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-cyan-500/40 rounded-2xl w-full max-w-4xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-4">
+        <div class="flex items-center gap-3">
+          <div id="modal-agent-avatar" class="w-11 h-11 rounded-xl flex items-center justify-center text-xl bg-cyan-100 dark:bg-cyan-600/20 border border-cyan-300 dark:border-cyan-500/40 text-cyan-600 dark:text-cyan-400"></div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="modal-agent-name" class="text-base font-bold font-mono text-slate-900 dark:text-white"></h3>
+              <span id="modal-agent-status-badge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded"></span>
+            </div>
+            <span id="modal-agent-role" class="text-xs font-mono text-cyan-700 dark:text-cyan-400 font-bold"></span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="copyTerminalText()" class="px-2.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 transition-colors">
+            <i class="fa-solid fa-copy mr-1"></i> 복사
+          </button>
+          <button onclick="closeAgentModal()" class="text-slate-400 hover:text-black dark:hover:text-white p-2 text-base"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- Agent Metadata Badges -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs mb-4">
+        <div class="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-white/5">
+          <span class="text-slate-400 text-[10px] block">TAB & PANE</span>
+          <strong id="modal-agent-tab" class="text-cyan-600 dark:text-cyan-400 text-sm"></strong>
+        </div>
+        <div class="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-white/5">
+          <span class="text-slate-400 text-[10px] block">AI MODEL</span>
+          <strong id="modal-agent-model" class="text-purple-600 dark:text-purple-400 text-sm"></strong>
+        </div>
+        <div class="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-white/5">
+          <span class="text-slate-400 text-[10px] block">CLI ENGINE</span>
+          <strong id="modal-agent-cli" class="text-emerald-600 dark:text-emerald-400 text-sm"></strong>
+        </div>
+        <div class="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-white/5">
+          <span class="text-slate-400 text-[10px] block">TOKEN / CONTEXT</span>
+          <strong id="modal-agent-tokens" class="text-amber-600 dark:text-amber-400 text-xs"></strong>
+        </div>
+      </div>
+
+      <!-- Live Terminal Output Area -->
+      <div class="flex-1 flex flex-col min-h-[300px] border border-slate-300 dark:border-white/10 rounded-xl overflow-hidden bg-slate-950">
+        <div class="bg-slate-900 px-3 py-2 border-b border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 live-indicator"></span>
+            <span>LIVE TERMINAL (herdr agent read)</span>
+          </div>
+          <div class="flex items-center gap-3 text-[11px]">
+            <label class="flex items-center gap-1.5 cursor-pointer select-none">
+              <input type="checkbox" id="modal-auto-refresh" checked class="rounded bg-slate-800 border-slate-700 text-cyan-500">
+              <span>자동 갱신 (1s)</span>
+            </label>
+            <button onclick="refreshModalTerminal()" class="hover:text-white"><i class="fa-solid fa-arrows-rotate"></i></button>
+          </div>
+        </div>
+        <pre id="modal-terminal-output" class="flex-1 p-4 font-mono text-xs text-slate-200 overflow-y-auto whitespace-pre-wrap select-text leading-relaxed bg-black/60"></pre>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== TASK DETAIL & ARTIFACTS MODAL ==================== -->
+  <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm hidden p-4" onclick="handleTaskModalBackdrop(event)">
+    <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-purple-500/40 rounded-2xl w-full max-w-2xl p-6 shadow-2xl flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-purple-100 dark:bg-purple-600/20 border border-purple-300 dark:border-purple-500/40 text-purple-600 dark:text-purple-400">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="task-modal-id" class="text-base font-bold font-mono text-slate-900 dark:text-white"></h3>
+              <span id="task-modal-status" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded"></span>
+            </div>
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Project Task Detail & Deliverables</span>
+          </div>
+        </div>
+
+        <button onclick="closeTaskModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Task Details Content -->
+      <div class="space-y-4 overflow-y-auto flex-1 pr-1 font-mono text-xs">
+        <div>
+          <label class="text-[10px] text-slate-400 block mb-1">TASK TITLE</label>
+          <div id="task-modal-title" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-white/5 font-semibold text-slate-800 dark:text-slate-200 leading-relaxed text-sm"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] text-slate-400 block mb-1">ASSIGNEE / OWNER</label>
+            <div id="task-modal-assignee" class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-white/5 font-bold text-cyan-600 dark:text-cyan-400"></div>
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 block mb-1">LAST UPDATED</label>
+            <div id="task-modal-updated" class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-300"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-[10px] text-slate-400">TASK ARTIFACTS & DELIVERABLES</label>
+            <span class="text-[10px] text-emerald-500 font-bold"><i class="fa-solid fa-box-open mr-1"></i>Output Store</span>
+          </div>
+          <div id="task-modal-artifacts" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- ==================== ARTIFACT MARKDOWN VIEWER MODAL ==================== -->
+  <div id="artifact-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-3 sm:p-6" onclick="handleArtifactModalBackdrop(event)">
+    <div class="bg-white dark:bg-[#0c101d] border border-slate-300 dark:border-purple-500/40 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[90vh] max-h-[880px] overflow-hidden" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/70 shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-purple-100 dark:bg-purple-600/20 border border-purple-300 dark:border-purple-500/40 text-purple-600 dark:text-purple-400 shrink-0">
+            <i class="fa-regular fa-file-lines"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 id="artifact-modal-filename" class="text-base font-bold font-mono text-slate-900 dark:text-white truncate"></h3>
+              <span id="artifact-modal-task-badge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30"></span>
+              <span id="artifact-modal-size-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-white/5"></span>
+              <span id="artifact-modal-time-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-white/5 hidden sm:inline-block"></span>
+            </div>
+            <div id="artifact-modal-path" class="text-xs font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5"></div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-2 shrink-0 ml-3">
+          <!-- View Mode Toggle -->
+          <div class="flex items-center bg-slate-200 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-300 dark:border-white/10 text-xs font-mono">
+            <button id="artifact-mode-preview" onclick="setArtifactViewMode('preview')" class="px-2.5 py-1 rounded-md text-purple-600 dark:text-purple-300 bg-white dark:bg-slate-900 font-bold shadow-sm transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-eye text-[10px]"></i><span>렌더링</span>
+            </button>
+            <button id="artifact-mode-raw" onclick="setArtifactViewMode('raw')" class="px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-code text-[10px]"></i><span>Raw</span>
+            </button>
+          </div>
+
+          <!-- Copy Button -->
+          <button id="artifact-copy-btn" onclick="copyCurrentArtifactContent()" class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10 hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-300 transition-all flex items-center gap-1.5" title="마크다운 내용 복사">
+            <i class="fa-regular fa-copy"></i>
+            <span id="artifact-copy-text" class="hidden sm:inline">복사</span>
+          </button>
+
+          <!-- Close Button -->
+          <button onclick="closeArtifactModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Multiple Artifacts Tab Bar -->
+      <div id="artifact-modal-tabs" class="flex items-center gap-1.5 px-5 sm:px-6 py-2 bg-slate-100/80 dark:bg-slate-950/70 border-b border-slate-200 dark:border-white/5 overflow-x-auto text-xs font-mono shrink-0"></div>
+
+      <!-- Modal Body -->
+      <div class="flex-1 overflow-hidden relative flex flex-col bg-slate-50/50 dark:bg-transparent">
+        
+        <!-- Loading State -->
+        <div id="artifact-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm z-10 transition-opacity">
+          <i class="fa-solid fa-circle-notch fa-spin text-3xl text-purple-500 mb-3"></i>
+          <span class="text-xs font-mono text-slate-500 dark:text-slate-400 font-semibold">산출물 문서 렌더링 중...</span>
+        </div>
+
+        <!-- Error State -->
+        <div id="artifact-error" class="hidden flex-1 p-8 flex flex-col items-center justify-center text-center">
+          <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center text-xl mb-3">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">문서를 불러올 수 없습니다</h4>
+          <p id="artifact-error-msg" class="text-xs font-mono text-slate-400 max-w-md"></p>
+        </div>
+
+        <!-- Rendered Markdown View -->
+        <div id="artifact-rendered-view" class="flex-1 p-6 sm:p-8 overflow-y-auto leading-relaxed markdown-content text-slate-800 dark:text-slate-200"></div>
+
+        <!-- Raw Source View -->
+        <div id="artifact-raw-view" class="hidden flex-1 overflow-hidden p-4">
+          <pre id="artifact-raw-content" class="w-full h-full p-4 overflow-auto rounded-xl bg-slate-950 text-slate-300 font-mono text-xs leading-relaxed border border-white/5 selection:bg-purple-900 selection:text-white"></pre>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-5 sm:px-6 py-2.5 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/40 flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 shrink-0">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-solid fa-keyboard text-slate-400"></i>
+          <span><kbd class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-white/10 text-[10px]">ESC</kbd> 키를 눌러 닫기</span>
+        </span>
+        <span id="artifact-modal-footer-info" class="truncate"></span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==================== IMAGE LIGHTBOX MODAL ==================== -->
+  <div id="image-lightbox-modal" class="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md hidden p-4 sm:p-8" onclick="closeImageLightbox()">
+    <div class="w-full max-w-6xl flex items-center justify-between mb-3 px-2" onclick="event.stopPropagation()">
+      <div class="flex items-center gap-2.5 text-white min-w-0">
+        <i class="fa-regular fa-image text-cyan-400"></i>
+        <span id="lightbox-caption" class="font-mono text-sm font-semibold truncate"></span>
+      </div>
+      <button onclick="closeImageLightbox()" class="w-9 h-9 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark text-base"></i>
+      </button>
+    </div>
+    <div class="relative max-w-6xl max-h-[85vh] flex items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-slate-950/60 shadow-2xl p-2" onclick="event.stopPropagation()">
+      <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[82vh] object-contain rounded-xl" />
+    </div>
+    <div class="mt-3 text-xs font-mono text-slate-400">
+      <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-white/10 text-[10px]">ESC</kbd> 또는 배경을 클릭하여 닫기
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT REAL-TIME SWARM ENGINE ==================== -->
+  <script>
+    /* =====================================================================
+       1. THEME ENGINE: SEAMLESS DARK / LIGHT TOGGLE
+       ===================================================================== */
+    let currentTheme = 'dark';
+
+    function setTheme(theme) {
+      currentTheme = theme;
+      const htmlEl = document.documentElement;
+      const btnDark = document.getElementById('theme-btn-dark');
+      const btnLight = document.getElementById('theme-btn-light');
+
+      if (theme === 'light') {
+        htmlEl.classList.remove('dark');
+        htmlEl.classList.add('light');
+        btnLight.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-white text-slate-900 shadow-md border border-slate-300 transition-all";
+        btnDark.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-600 hover:text-slate-900 transition-all";
+      } else {
+        htmlEl.classList.remove('light');
+        htmlEl.classList.add('dark');
+        btnDark.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-slate-800 text-cyan-300 shadow-md border border-cyan-500/40 transition-all";
+        btnLight.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-400 hover:text-white transition-all";
+      }
+    }
+
+    function toggleTheme() {
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 't' || e.key === 'T') toggleTheme();
+      if (e.key === 'Escape') {
+        const imgModal = document.getElementById('image-lightbox-modal');
+        if (imgModal && !imgModal.classList.contains('hidden')) {
+          closeImageLightbox();
+          return;
+        }
+        const artModal = document.getElementById('artifact-modal');
+        if (artModal && !artModal.classList.contains('hidden')) {
+          closeArtifactModal();
+          return;
+        }
+        const taskModal = document.getElementById('task-modal');
+        if (taskModal && !taskModal.classList.contains('hidden')) {
+          closeTaskModal();
+          return;
+        }
+      }
+    });
+
+    /* =====================================================================
+       2. SWARM AGENTS & LIVE DATA DEFINITIONS (8 ROLES)
+       ===================================================================== */
+    let liveAgents = [
+      { id: 'controller', name: '@controller', role: 'Orchestrator & Dispatcher', tab: 'Dev1', pane_id: 'w4:p2', model: 'Gemini 3.8 Flash', status: 'IDLE', color: '#06b6d4', icon: 'fa-sitemap', thought: 'Standby for operator command', current_task: 'Task Coordination', metrics: 'Ready' },
+      { id: 'planner', name: '@planner', role: 'Task Graph & RCA Troubleshooter', tab: 'Dev1', pane_id: 'w4:p3', model: 'Gemini 3.8 Flash', status: 'IDLE', color: '#3b82f6', icon: 'fa-brain', thought: 'Standby for WBS request', current_task: 'Backlog Grooming', metrics: 'Ready' },
+      { id: 'architector', name: '@architector', role: 'API Contract Keeper', tab: 'Dev2', pane_id: 'w4:p4', model: 'Gemini 3.8 Flash', status: 'IDLE', color: '#8b5cf6', icon: 'fa-layer-group', thought: 'Contract & Refactoring Guard', current_task: 'Contract First Guard', metrics: 'Ready' },
+      { id: 'designer', name: '@designer', role: 'UI/UX Design Specialist', tab: 'Dev2', pane_id: 'w4:p5', model: 'Gemini 4 Argon', status: 'IDLE', color: '#ec4899', icon: 'fa-palette', thought: 'Design Tokens & Semantic UI', current_task: 'Design System', metrics: 'Ready' },
+      { id: 'frontend', name: '@frontend', role: 'Client App & UI Engineer', tab: 'Dev3', pane_id: 'w4:p6', model: 'Gemini 4 Hydrogen', status: 'IDLE', color: '#10b981', icon: 'fa-desktop', thought: 'Browser UI & State Engine', current_task: 'Canvas Components', metrics: 'Ready' },
+      { id: 'backend', name: '@backend', role: 'Core Engine & API Service', tab: 'Dev3', pane_id: 'w4:p7', model: 'Gemini 4 Hydrogen', status: 'IDLE', color: '#14b8a6', icon: 'fa-server', thought: 'API Endpoints & Domain Logic', current_task: 'Service Validation', metrics: 'Ready' },
+      { id: 'reviewer', name: '@reviewer', role: 'Independent Code Auditor', tab: 'Dev4', pane_id: 'w4:p8', model: 'Claude Sonnet', status: 'IDLE', color: '#f59e0b', icon: 'fa-code-compare', thought: 'Contract Compliance & Security', current_task: 'Code Review', metrics: 'Ready' },
+      { id: 'qa', name: '@qa', role: 'Autonomous E2E & Browser Test', tab: 'Dev4', pane_id: 'w4:p9', model: 'GLM-5.3-Flash', status: 'IDLE', color: '#f43f5e', icon: 'fa-vial-circle-check', thought: 'E2E Testing & Verification', current_task: 'Regression Testing', metrics: 'Ready' }
+    ];
+
+    let liveRefreshActive = true;
+    let liveRefreshTimer = null;
+    let viewMode = 'topology';
+    let activeModalAgent = null;
+    let modalRefreshTimer = null;
+
+    /* =====================================================================
+       3. TOPOLOGY CANVAS ENGINE & PARTICLES
+       ===================================================================== */
+    const canvas = document.getElementById('mesh-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let arrivalBursts = [];
+    let userDirectiveWorkflows = [];
+    let draggedNode = null;
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      calculateNodePositions();
+    }
+
+    function calculateNodePositions() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+
+      // 1. Controller at Top Center (Apex Orchestrator)
+      const c = liveAgents.find(a => a.id === 'controller') || liveAgents[0];
+      c.x = cx;
+      c.y = 72;
+      c.radius = 32;
+
+      // 2. 7 Squad Agents in Software Lifecycle Pipeline order across the bottom
+      // [Planning & Architecture] -> [Core Execution] -> [Quality & Audit]
+      const pipelineOrder = ['planner', 'architector', 'designer', 'frontend', 'backend', 'reviewer', 'qa'];
+      const marginX = Math.max(65, w * 0.075);
+      const usableW = w - marginX * 2;
+      const stepX = usableW / (pipelineOrder.length - 1);
+
+      pipelineOrder.forEach((id, idx) => {
+        const a = liveAgents.find(ag => ag.id === id);
+        if (!a) return;
+        const x = marginX + idx * stepX;
+
+        // Subtle curved command bridge arc: center nodes slightly lower for futuristic depth
+        const normDist = (idx - 3) / 3; // -1 to 1
+        const curveOffset = Math.cos(normDist * (Math.PI / 3.2)) * 26; // ~26px center curve
+        const y = Math.min(h - 95, h * 0.70 + (26 - curveOffset));
+
+        a.x = x;
+        a.y = y;
+        a.radius = 24;
+      });
+    }
+
+    function isAgentActive(agentOrId) {
+      if (!agentOrId) return false;
+      const a = typeof agentOrId === 'string' ? liveAgents.find(x => x.id === agentOrId) : agentOrId;
+      if (!a) return false;
+      const st = (a.status || '').toUpperCase();
+      return st === 'WORKING' || st === 'RUNNING' || st === 'GENERATING';
+    }
+
+    function getActiveWorkflows() {
+      const workflows = [];
+      const now = Date.now();
+
+      // 1. Scan active tasks (in_progress, review_qa, DEV, WORKING)
+      const activeTasks = (allLiveTasks || []).filter(t => {
+        const st = (t.status || '').toUpperCase();
+        return st.includes('PROGRESS') || st.includes('DEV') || st.includes('WORKING') || st.includes('REVIEW') || st.includes('QA');
+      });
+
+      activeTasks.forEach(t => {
+        const taskId = t.id || 'TASK';
+        const shortTask = taskId.length > 12 ? taskId.slice(0, 8) + '..' : taskId;
+        const assignee = (t.assignee || '').toLowerCase();
+        const waitingOn = (t.waiting_on || '').toLowerCase();
+
+        const candidateAgents = ['backend', 'frontend', 'reviewer', 'qa', 'planner', 'designer', 'architector'];
+        const matched = candidateAgents.filter(id => assignee.includes(id) || waitingOn.includes(id));
+
+        // 🌟 CRITICAL: Only agents that are CURRENTLY WORKING/RUNNING have active transmissions!
+        // If an agent finished its task and returned to IDLE, transmission is immediately disconnected.
+        const workingAgents = matched.filter(id => isAgentActive(id));
+
+        if (workingAgents.length > 0) {
+          workingAgents.forEach(agentId => {
+            workflows.push({
+              id: `${taskId}-${agentId}`,
+              src: 'controller',
+              dst: agentId,
+              taskId: taskId,
+              label: shortTask,
+              type: 'TASK_STREAM',
+              color: '#06b6d4'
+            });
+          });
+
+          // Peer-to-peer collaboration links (BOTH agents must be actively WORKING)
+          if (workingAgents.includes('backend') && workingAgents.includes('frontend')) {
+            workflows.push({
+              id: `${taskId}-be-fe`,
+              src: 'frontend',
+              dst: 'backend',
+              taskId: taskId,
+              label: 'API_CONTRACT',
+              type: 'COLLAB',
+              color: '#10b981'
+            });
+          }
+          if (workingAgents.includes('backend') && workingAgents.includes('reviewer')) {
+            workflows.push({
+              id: `${taskId}-be-rev`,
+              src: 'backend',
+              dst: 'reviewer',
+              taskId: taskId,
+              label: 'CODE_REVIEW',
+              type: 'REVIEW',
+              color: '#f59e0b'
+            });
+          }
+          if (workingAgents.includes('reviewer') && workingAgents.includes('qa')) {
+            workflows.push({
+              id: `${taskId}-rev-qa`,
+              src: 'reviewer',
+              dst: 'qa',
+              taskId: taskId,
+              label: 'QA_VERIFY',
+              type: 'VERIFY',
+              color: '#f43f5e'
+            });
+          }
+        } else {
+          liveAgents.forEach(a => {
+            if (a.id !== 'controller' && isAgentActive(a) && a.current_task && a.current_task.includes(taskId.slice(0, 8))) {
+              workflows.push({
+                id: `${taskId}-${a.id}`,
+                src: 'controller',
+                dst: a.id,
+                taskId: taskId,
+                label: shortTask,
+                type: 'TASK_STREAM',
+                color: a.color
+              });
+            }
+          });
+        }
+      });
+
+      // 2. Also check any agent currently in WORKING or RUNNING status
+      liveAgents.forEach(a => {
+        if (a.id !== 'controller' && isAgentActive(a)) {
+          const already = workflows.some(w => w.dst === a.id || w.src === a.id);
+          if (!already) {
+            const shortTask = (a.current_task && a.current_task !== '대기 중 (Standby)')
+              ? (a.current_task.length > 10 ? a.current_task.slice(0, 8) + '..' : a.current_task)
+              : 'EXEC_WORK';
+            workflows.push({
+              id: `active-${a.id}`,
+              src: 'controller',
+              dst: a.id,
+              taskId: a.current_task || 'WORKING',
+              label: shortTask,
+              type: 'TELEMETRY',
+              color: a.color
+            });
+          }
+        }
+      });
+
+      // 3. User directive workflows (active for up to 15s if working, or 5s if idle)
+      userDirectiveWorkflows = userDirectiveWorkflows.filter(u => {
+        const targetActive = isAgentActive(u.dst);
+        const maxDuration = targetActive ? 15000 : 5000;
+        return now - u.timestamp < maxDuration;
+      });
+      userDirectiveWorkflows.forEach(u => {
+        workflows.push(u);
+      });
+
+      return workflows;
+    }
+
+    function spawnPacket(srcId, dstId, type = "TASK_SYNC", label = "", color = null) {
+      const src = liveAgents.find(a => a.id === srcId);
+      const dst = liveAgents.find(a => a.id === dstId);
+      if (!src || !dst) return;
+
+      // 🌟 Transmission cutoff guard: Squad agents that are IDLE cannot transmit or receive packets
+      const srcSquad = src.id !== 'controller' ? src : null;
+      const dstSquad = dst.id !== 'controller' ? dst : null;
+      if (srcSquad && !isAgentActive(srcSquad)) return;
+      if (dstSquad && !isAgentActive(dstSquad)) return;
+
+      particles.push({
+        src,
+        dst,
+        type,
+        label: label || type,
+        color: color || src.color || '#06b6d4',
+        progress: 0,
+        speed: 0.013 + Math.random() * 0.009
+      });
+    }
+
+    function transmitActiveWorkflowPackets() {
+      const activeWorkflows = getActiveWorkflows();
+      if (activeWorkflows.length === 0) {
+        // No active workflows: network remains in peaceful, elegant standby
+        return;
+      }
+
+      activeWorkflows.forEach(wf => {
+        // Direction alternating: 60% controller/src -> dst, 40% telemetry back
+        const isForward = Math.random() < 0.6;
+        const srcId = isForward ? wf.src : wf.dst;
+        const dstId = isForward ? wf.dst : wf.src;
+        const packetType = isForward ? wf.type : 'TELEMETRY';
+        const packetLabel = isForward ? wf.label : 'ACK';
+        spawnPacket(srcId, dstId, packetType, packetLabel, wf.color);
+      });
+    }
+
+    function renderTopology() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const isLight = currentTheme === 'light';
+      const standbyLinkColor = isLight ? 'rgba(14, 165, 233, 0.22)' : 'rgba(56, 189, 248, 0.16)';
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // 0. Tactical Phase Zone Badges at Top of Wide Screen
+      ctx.save();
+      ctx.font = 'bold 9px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+      ctx.fillStyle = isLight ? 'rgba(100, 116, 139, 0.45)' : 'rgba(148, 163, 184, 0.35)';
+      ctx.textAlign = 'center';
+      if (w > 640) {
+        ctx.fillText("◀ PHASE 1: SPECS & ARCHITECTURE", w * 0.20, 25);
+        ctx.fillText("APEX ORCHESTRATOR BRIDGE", w * 0.50, 25);
+        ctx.fillText("PHASE 3: QA & AUDIT ▶", w * 0.80, 25);
+      }
+      ctx.restore();
+
+      const activeWorkflows = getActiveWorkflows();
+      const activePairSet = new Set();
+      activeWorkflows.forEach(w => {
+        activePairSet.add(`${w.src}->${w.dst}`);
+        activePairSet.add(`${w.dst}->${w.src}`);
+      });
+
+      // 1. Draw Links from Controller to all 7 pipeline agents
+      const controller = liveAgents.find(a => a.id === 'controller');
+      if (controller) {
+        liveAgents.forEach(a => {
+          if (a.id === 'controller') return;
+          const isActive = activePairSet.has(`controller->${a.id}`) && isAgentActive(a);
+
+          if (isActive) {
+            // High-voltage energetic laser conduit
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(controller.x, controller.y);
+            ctx.lineTo(a.x, a.y);
+            ctx.strokeStyle = isLight ? 'rgba(6, 182, 212, 0.45)' : 'rgba(56, 189, 248, 0.38)';
+            ctx.lineWidth = 5;
+            ctx.shadowColor = '#06b6d4';
+            ctx.shadowBlur = 12;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(controller.x, controller.y);
+            ctx.lineTo(a.x, a.y);
+            ctx.strokeStyle = isLight ? '#0284c7' : '#38bdf8';
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([10, 8]);
+            ctx.lineDashOffset = -(Date.now() / 20) % 18;
+            ctx.stroke();
+            ctx.restore();
+          } else {
+            ctx.beginPath();
+            ctx.moveTo(controller.x, controller.y);
+            ctx.lineTo(a.x, a.y);
+            ctx.strokeStyle = standbyLinkColor;
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        });
+      }
+
+      // 2. Horizontal Pipeline Stage Collaboration Links (Left to Right)
+      const pipelineLinks = [
+        ['planner', 'architector'],
+        ['architector', 'designer'],
+        ['designer', 'frontend'],
+        ['frontend', 'backend'],
+        ['backend', 'reviewer'],
+        ['reviewer', 'qa']
+      ];
+      pipelineLinks.forEach(([id1, id2]) => {
+        const a1 = liveAgents.find(a => a.id === id1);
+        const a2 = liveAgents.find(a => a.id === id2);
+        if (a1 && a2) {
+          const isActive = (activePairSet.has(`${id1}->${id2}`) || activePairSet.has(`${id2}->${id1}`)) && isAgentActive(a1) && isAgentActive(a2);
+          if (isActive) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(a1.x, a1.y);
+            ctx.lineTo(a2.x, a2.y);
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+            ctx.lineWidth = 4;
+            ctx.shadowColor = '#10b981';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(a1.x, a1.y);
+            ctx.lineTo(a2.x, a2.y);
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 8]);
+            ctx.lineDashOffset = -(Date.now() / 20) % 16;
+            ctx.stroke();
+            ctx.restore();
+          } else {
+            ctx.beginPath();
+            ctx.moveTo(a1.x, a1.y);
+            ctx.lineTo(a2.x, a2.y);
+            ctx.strokeStyle = isLight ? 'rgba(168, 85, 247, 0.22)' : 'rgba(168, 85, 247, 0.16)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+          }
+        }
+      });
+
+      // 2. Animate and Draw Particles (Comet-tail photons + micro badges)
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+
+        // 🌟 Instantly purge in-flight packets if either connected squad agent is IDLE
+        const pSrcSquad = p.src.id !== 'controller' ? p.src : null;
+        const pDstSquad = p.dst.id !== 'controller' ? p.dst : null;
+        if ((pSrcSquad && !isAgentActive(pSrcSquad)) || (pDstSquad && !isAgentActive(pDstSquad))) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        p.progress += p.speed;
+        if (p.progress >= 1) {
+          // Trigger impact burst at destination
+          arrivalBursts.push({
+            x: p.dst.x,
+            y: p.dst.y,
+            radius: 4,
+            maxRadius: 28,
+            color: p.color || '#06b6d4',
+            alpha: 0.95
+          });
+          particles.splice(i, 1);
+          continue;
+        }
+
+        const px = p.src.x + (p.dst.x - p.src.x) * p.progress;
+        const py = p.src.y + (p.dst.y - p.src.y) * p.progress;
+
+        // Comet tail (trailing 5 positions)
+        const trailLen = 5;
+        for (let t = trailLen; t >= 1; t--) {
+          const tp = Math.max(0, p.progress - t * 0.012);
+          const tx = p.src.x + (p.dst.x - p.src.x) * tp;
+          const ty = p.src.y + (p.dst.y - p.src.y) * tp;
+          const tailAlpha = (1 - (t / (trailLen + 1))) * 0.55;
+          ctx.beginPath();
+          ctx.arc(tx, ty, Math.max(1.5, 4 - t * 0.5), 0, Math.PI * 2);
+          ctx.fillStyle = (p.color || '#06b6d4') + Math.floor(tailAlpha * 255).toString(16).padStart(2, '0');
+          ctx.fill();
+        }
+
+        // Glowing Photon Head
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = p.color || '#38bdf8';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(px, py, 6.5, 0, Math.PI * 2);
+        ctx.strokeStyle = p.color || '#38bdf8';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+
+        // Micro payload pill tag
+        if (p.label) {
+          ctx.save();
+          ctx.font = 'bold 8px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+          const tw = ctx.measureText(p.label).width;
+          const pillW = tw + 8;
+          const pillH = 13;
+          const pillX = px - pillW / 2;
+          const pillY = py - 18;
+
+          ctx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.92)' : 'rgba(15, 23, 42, 0.92)';
+          ctx.strokeStyle = (p.color || '#38bdf8') + '99';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(pillX, pillY, pillW, pillH, 3);
+          } else {
+            ctx.rect(pillX, pillY, pillW, pillH);
+          }
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = isLight ? '#0f172a' : '#f8fafc';
+          ctx.textAlign = 'center';
+          ctx.fillText(p.label, px, pillY + 9.5);
+          ctx.restore();
+        }
+      }
+
+      // Draw Arrival Bursts
+      for (let b = arrivalBursts.length - 1; b >= 0; b--) {
+        const burst = arrivalBursts[b];
+        burst.radius += 1.3;
+        burst.alpha -= 0.045;
+        if (burst.alpha <= 0 || burst.radius >= burst.maxRadius) {
+          arrivalBursts.splice(b, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(burst.x, burst.y, burst.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = burst.color + Math.floor(burst.alpha * 255).toString(16).padStart(2, '0');
+        ctx.lineWidth = 2;
+        ctx.shadowColor = burst.color;
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 3. Draw Nodes with Rotating Neon Gears & Radar Waves for Working Agents
+      const now = Date.now();
+      liveAgents.forEach(a => {
+        const isWorking = a.status === 'WORKING' || a.status === 'RUNNING';
+
+        if (isWorking) {
+          // Sonar / Radar pulse wave
+          const pulsePhase = (now % 1600) / 1600;
+          const pulseR = a.radius + 6 + pulsePhase * 22;
+          const pulseAlpha = Math.max(0, (1 - pulsePhase) * 0.7);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, pulseR, 0, Math.PI * 2);
+          ctx.strokeStyle = (a.color || '#10b981') + Math.floor(pulseAlpha * 255).toString(16).padStart(2, '0');
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+          ctx.restore();
+
+          // Rotating Neon Tech Gear Ring (3 segmented arcs)
+          const angle = (now / 700) % (Math.PI * 2);
+          ctx.save();
+          ctx.translate(a.x, a.y);
+          ctx.rotate(angle);
+          ctx.strokeStyle = a.color || '#10b981';
+          ctx.lineWidth = 2.2;
+          ctx.shadowColor = a.color || '#10b981';
+          ctx.shadowBlur = 10;
+          for (let seg = 0; seg < 3; seg++) {
+            ctx.beginPath();
+            const sa = (seg * Math.PI * 2) / 3;
+            ctx.arc(0, 0, a.radius + 7, sa, sa + (Math.PI / 2.6));
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        // Node circle
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.radius, 0, Math.PI * 2);
+        ctx.fillStyle = isLight ? '#ffffff' : '#0f172a';
+        ctx.fill();
+
+        ctx.strokeStyle = a.color || '#06b6d4';
+        ctx.lineWidth = isWorking ? 3 : 2;
+        ctx.shadowColor = a.color || '#06b6d4';
+        ctx.shadowBlur = isWorking ? 14 : 5;
+        ctx.stroke();
+        ctx.restore();
+
+        // Inner subtle ring
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.radius - 4, 0, Math.PI * 2);
+        ctx.strokeStyle = (a.color || '#06b6d4') + '30';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Center Initial or Glyph
+        ctx.font = `bold ${a.id === 'controller' ? '12px' : '10px'} "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace`;
+        ctx.fillStyle = a.color || '#06b6d4';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const initial = a.id === 'controller' ? 'CTL' : a.name.slice(1, 4).toUpperCase();
+        ctx.fillText(initial, a.x, a.y);
+        ctx.textBaseline = 'alphabetic';
+
+        // Label
+        ctx.font = 'bold 11px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+        ctx.fillStyle = isLight ? '#0f172a' : '#f8fafc';
+        ctx.textAlign = 'center';
+        ctx.fillText(a.name, a.x, a.y + a.radius + 14);
+
+        // Status pill
+        ctx.font = '9px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+        ctx.fillStyle = isWorking ? '#10b981' : (a.status === 'DONE' ? '#a855f7' : '#94a3b8');
+        const stText = isWorking ? `⚡ ${a.status}` : `[${a.status}]`;
+        ctx.fillText(stText, a.x, a.y + a.radius + 25);
+      });
+
+      requestAnimationFrame(renderTopology);
+    }
+
+    // Node Click & Drag handlers
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      for (const a of liveAgents) {
+        const dist = Math.hypot(mx - a.x, my - a.y);
+        if (dist <= a.radius + 5) {
+          draggedNode = a;
+          draggedNode.startX = mx;
+          draggedNode.startY = my;
+          draggedNode.hasMoved = false;
+          return;
+        }
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!draggedNode) return;
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      if (Math.hypot(mx - draggedNode.startX, my - draggedNode.startY) > 5) {
+        draggedNode.hasMoved = true;
+      }
+      draggedNode.x = mx;
+      draggedNode.y = my;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (draggedNode && !draggedNode.hasMoved) {
+        openAgentModal(draggedNode.id);
+      }
+      draggedNode = null;
+    });
+
+    /* =====================================================================
+       4. CARDS VIEW RENDERER (8 AGENTS)
+       ===================================================================== */
+    function setViewMode(mode) {
+      viewMode = mode;
+      const topWrapper = document.getElementById('topology-view-wrapper');
+      const gridWrapper = document.getElementById('agents-grid');
+      const btnTop = document.getElementById('view-topology-btn');
+      const btnCards = document.getElementById('view-cards-btn');
+
+      if (mode === 'topology') {
+        topWrapper.classList.remove('hidden');
+        gridWrapper.classList.add('hidden');
+        btnTop.className = "px-2.5 py-1 rounded bg-white dark:bg-cyan-500/30 text-slate-900 dark:text-cyan-300 font-bold shadow-sm transition-all";
+        btnCards.className = "px-2.5 py-1 rounded text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
+      } else {
+        topWrapper.classList.add('hidden');
+        gridWrapper.classList.remove('hidden');
+        btnCards.className = "px-2.5 py-1 rounded bg-white dark:bg-cyan-500/30 text-slate-900 dark:text-cyan-300 font-bold shadow-sm transition-all";
+        btnTop.className = "px-2.5 py-1 rounded text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
+        renderAgentsGrid();
+      }
+    }
+
+    function renderAgentsGrid() {
+      const container = document.getElementById('agents-grid');
+      container.innerHTML = '';
+
+      liveAgents.forEach(a => {
+        const isWorking = a.status === 'WORKING' || a.status === 'RUNNING' || a.status === 'GENERATING';
+        const stBadgeColor = isWorking 
+          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.28)]'
+          : (a.status === 'DONE' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-transparent');
+
+        const card = document.createElement('div');
+        card.className = isWorking
+          ? "themed-card agent-card-working p-3.5 rounded-xl flex flex-col justify-between space-y-3 cursor-pointer transition-all"
+          : "themed-card p-3.5 rounded-xl flex flex-col justify-between space-y-3 cursor-pointer hover:border-cyan-500 transition-all opacity-80 hover:opacity-100";
+        card.onclick = () => openAgentModal(a.id);
+
+        const statusBadgeHtml = isWorking
+          ? `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${stBadgeColor} flex items-center gap-1.5">
+               <span class="relative flex h-2 w-2">
+                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+               </span>
+               ⚡ ${a.status}
+             </span>`
+          : `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${stBadgeColor}">
+               ${a.status}
+             </span>`;
+
+        const thoughtBoxHtml = isWorking
+          ? `<div class="mt-2.5 p-2 rounded-lg bg-emerald-500/5 dark:bg-emerald-950/30 border border-emerald-500/30 text-[11px] font-mono text-emerald-700 dark:text-emerald-300 leading-tight flex items-center gap-2">
+               <div class="flex items-end gap-[2px] h-3.5 shrink-0">
+                 <span class="working-eq-bar"></span>
+                 <span class="working-eq-bar"></span>
+                 <span class="working-eq-bar"></span>
+               </div>
+               <span class="truncate">${a.thought}</span>
+             </div>`
+          : `<div class="mt-2.5 p-2 rounded-lg bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-white/5 text-[11px] font-mono text-slate-600 dark:text-slate-400 leading-tight truncate">
+               ${a.thought}
+             </div>`;
+
+        card.innerHTML = `
+          ${isWorking ? '<div class="working-scanline"></div>' : ''}
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-white/5">
+              <div class="flex items-center gap-2">
+                <div class="relative">
+                  ${isWorking ? `<span class="absolute -inset-1 rounded-lg animate-ping opacity-40" style="background: ${a.color};"></span>` : ''}
+                  <div class="relative w-7 h-7 rounded-lg flex items-center justify-center text-xs ${isWorking ? 'shadow-md' : ''}" style="background: ${a.color}25; color: ${a.color}; border: 1px solid ${a.color}${isWorking ? '99' : '50'};">
+                    <i class="fa-solid ${a.icon} ${isWorking ? 'animate-pulse' : ''}"></i>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="font-mono font-bold text-xs text-slate-900 dark:text-white">${a.name}</h4>
+                  <span class="text-[10px] font-mono text-slate-500">${a.tab} · ${a.pane_id}</span>
+                </div>
+              </div>
+              ${statusBadgeHtml}
+            </div>
+
+            <div class="mt-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+              ${a.role}
+            </div>
+            <div class="text-[11px] font-mono text-slate-500 mt-0.5">
+              ${a.model}
+            </div>
+
+            ${thoughtBoxHtml}
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/5 text-[10px] font-mono">
+            <span class="text-cyan-600 dark:text-cyan-400 font-semibold truncate">${a.metrics}</span>
+            <button class="text-slate-400 hover:text-cyan-400 flex items-center gap-1">
+              <span>Terminal</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    /* =====================================================================
+       5. REAL-TIME API SYNC ENGINE
+       ===================================================================== */
+    async function fetchSwarmStatus() {
+      try {
+        const res = await fetch('/api/status');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById('session-id').innerText = data.session || 'Dev';
+        document.getElementById('active-agent-count').innerText = data.agents_count || 8;
+        const activeStatus = document.getElementById('active-agent-status');
+        if (activeStatus) {
+          activeStatus.innerText = data.active_agents > 0 
+            ? `${data.active_agents} Working / ${data.agents_count} Total` 
+            : `0 Working / ${data.agents_count} Ready`;
+        }
+        document.getElementById('task-pct').innerText = `${data.task_progress.percent}%`;
+        document.getElementById('task-completed-count').innerText = data.task_progress.completed;
+        document.getElementById('task-total-count').innerText = data.task_progress.total;
+        document.getElementById('task-progress-bar').style.width = `${data.task_progress.percent}%`;
+        const taskBd = document.getElementById('task-breakdown');
+        if (taskBd && data.task_progress) {
+          taskBd.innerHTML = `
+            <span>Queued: <b class="text-slate-700 dark:text-slate-300">${data.task_progress.queued || 0}</b></span>
+            <span>Exec: <b class="text-cyan-500">${data.task_progress.in_progress || 0}</b></span>
+            <span>Review: <b class="text-purple-400">${data.task_progress.review_qa || 0}</b></span>
+            <span>Done: <b class="text-emerald-500">${data.task_progress.completed || 0}</b></span>
+          `;
+        }
+        document.getElementById('vector-count').innerText = (data.memory.chunks || 0).toLocaleString();
+        document.getElementById('graph-entities').innerText = (data.memory.relations || 0).toLocaleString();
+
+        // Project dropdown update
+        const sel = document.getElementById('project-select');
+        if (data.projects && sel) {
+          sel.innerHTML = '';
+          data.projects.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.innerText = p;
+            opt.className = "bg-slate-900 text-white";
+            if (p === data.active_project) opt.selected = true;
+            sel.appendChild(opt);
+          });
+        }
+      } catch (err) {
+        console.warn('Status fetch error:', err);
+      }
+    }
+
+    async function fetchAgents() {
+      try {
+        const res = await fetch('/api/agents');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.agents && data.agents.length > 0) {
+          // 상태 변경 감지 시 파티클 생성
+          data.agents.forEach(newA => {
+            const oldA = liveAgents.find(a => a.id === newA.id);
+            if (oldA && oldA.status !== newA.status && (newA.status === 'WORKING' || newA.status === 'RUNNING')) {
+              spawnPacket('controller', newA.id, 'DIRECTIVE');
+              appendLog("DISPATCH", `Controller delegated to ${newA.name} [${newA.tab}]`, "cyan");
+            }
+          });
+
+          // 병합
+          data.agents.forEach(na => {
+            const match = liveAgents.find(a => a.id === na.id);
+            if (match) {
+              Object.assign(match, na);
+            }
+          });
+
+          if (viewMode === 'cards') renderAgentsGrid();
+        }
+      } catch (err) {
+        console.warn('Agents fetch error:', err);
+      }
+    }
+
+    let allLiveTasks = [];
+
+    async function fetchTasks() {
+      try {
+        const res = await fetch('/api/tasks');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        allLiveTasks = [
+          ...(data.queued || []),
+          ...(data.in_progress || []),
+          ...(data.review_qa || []),
+          ...(data.done || [])
+        ];
+
+        renderKanbanCol('kanban-queued', 'badge-queued', data.queued || []);
+        renderKanbanCol('kanban-exec', 'badge-exec', data.in_progress || [], true);
+        renderKanbanCol('kanban-review', 'badge-review', data.review_qa || []);
+        renderKanbanCol('kanban-done', 'badge-done', data.done || []);
+
+        const total = (data.queued.length + data.in_progress.length + data.review_qa.length + data.done.length);
+        document.getElementById('kanban-total-badge').innerText = `${total} Tasks`;
+      } catch (err) {
+        console.warn('Tasks fetch error:', err);
+      }
+    }
+
+    function renderKanbanCol(containerId, badgeId, tasks, isActiveCol = false) {
+      const container = document.getElementById(containerId);
+      const badge = document.getElementById(badgeId);
+      if (!container || !badge) return;
+      badge.innerText = tasks.length;
+
+      // Smart hash comparison: only redraw DOM if tasks list or status changed
+      const hash = tasks.slice(0, 20).map(t => `${t.id}-${t.status}-${t.assignee}`).join('|');
+      if (container.dataset.lastHash === hash) return;
+      container.dataset.lastHash = hash;
+
+      container.innerHTML = '';
+
+      if (tasks.length === 0) {
+        container.innerHTML = `<div class="text-[10px] font-mono text-slate-500 py-3 text-center">비어 있음</div>`;
+        return;
+      }
+
+      tasks.slice(0, 20).forEach(t => {
+        const item = document.createElement('div');
+        const activeClass = isActiveCol 
+          ? "border-cyan-500/60 shadow-cyan-500/10 shadow-sm" 
+          : "border-slate-200 dark:border-white/5 hover:border-cyan-500/50";
+
+        item.className = `p-2.5 rounded-xl bg-white dark:bg-slate-900 border ${activeClass} shadow-sm space-y-1.5 transition-all cursor-pointer group`;
+        item.onclick = () => openTaskModal(t.id);
+
+        item.innerHTML = `
+          <div class="flex items-center justify-between text-[10px] font-mono">
+            <span class="font-bold text-cyan-600 dark:text-cyan-400 group-hover:underline">${escapeHtml(t.id)}</span>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">${escapeHtml(t.assignee || 'Dev')}</span>
+          </div>
+          <div class="text-[11px] font-semibold text-slate-800 dark:text-slate-200 line-clamp-2 leading-tight">
+            ${escapeHtml(t.title)}
+          </div>
+          ${t.artifacts && t.artifacts.length > 0 ? `
+            <div class="flex items-center gap-1 text-[9px] font-mono text-emerald-600 dark:text-emerald-400">
+              <i class="fa-solid fa-file-lines text-[8px]"></i>
+              <span>${t.artifacts.length} 산출물</span>
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function openTaskModal(taskId) {
+      const task = allLiveTasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      document.getElementById('task-modal-id').innerText = task.id;
+      document.getElementById('task-modal-title').innerText = task.title;
+      document.getElementById('task-modal-assignee').innerText = task.assignee || 'Controller';
+      document.getElementById('task-modal-updated').innerText = task.updated_at || 'Recently';
+
+      const statusBadge = document.getElementById('task-modal-status');
+      statusBadge.innerText = task.status;
+      if (task.status.includes('DONE') || task.status.includes('COMPLETED')) {
+        statusBadge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+      } else if (task.status.includes('PROGRESS') || task.status.includes('WORKING')) {
+        statusBadge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 animate-pulse";
+      } else {
+        statusBadge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700";
+      }
+
+      const artContainer = document.getElementById('task-modal-artifacts');
+      artContainer.innerHTML = '';
+      if (task.artifacts && task.artifacts.length > 0) {
+        task.artifacts.forEach(art => {
+          const artItem = document.createElement('div');
+          artItem.className = "p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-white/5 hover:border-purple-500/60 dark:hover:border-purple-500/60 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 cursor-pointer transition-all flex items-center justify-between group shadow-sm";
+          const fname = art.split('/').pop();
+          const isMd = fname.toLowerCase().endsWith('.md');
+          artItem.onclick = () => openArtifactViewer(task.id, art);
+          artItem.innerHTML = `
+            <div class="flex items-center gap-2.5 truncate min-w-0 pr-2">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isMd ? 'bg-purple-100 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/30' : 'bg-cyan-100 dark:bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30'}">
+                <i class="${isMd ? 'fa-regular fa-file-lines' : 'fa-solid fa-file-code'} text-xs"></i>
+              </div>
+              <div class="truncate">
+                <div class="truncate font-semibold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">${fname}</div>
+                <div class="text-[10px] text-slate-400 truncate">${art}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-500/30 group-hover:bg-purple-600 group-hover:text-white transition-all flex items-center gap-1 shadow-xs">
+                <i class="fa-solid fa-eye text-[9px]"></i> 렌더링 보기
+              </span>
+            </div>
+          `;
+          artContainer.appendChild(artItem);
+        });
+      } else {
+        artContainer.innerHTML = `<div class="text-xs text-slate-500 font-mono py-2">등록된 산출물이 없습니다.</div>`;
+      }
+
+      document.getElementById('task-modal').classList.remove('hidden');
+    }
+
+    function handleTaskModalBackdrop(e) {
+      if (e.target.id === 'task-modal') {
+        closeTaskModal();
+      }
+    }
+
+    function closeTaskModal() {
+      document.getElementById('task-modal').classList.add('hidden');
+    }
+
+    /* =====================================================================
+       4.1 ARTIFACT MARKDOWN VIEWER ENGINE
+       ===================================================================== */
+    let currentArtifactData = null;
+    let currentArtifactViewMode = 'preview';
+    let currentArtifactTaskId = '';
+    let currentArtifactList = [];
+
+    function handleArtifactModalBackdrop(e) {
+      if (e.target.id === 'artifact-modal') {
+        closeArtifactModal();
+      }
+    }
+
+    async function openArtifactViewer(taskId, artifactPath) {
+      currentArtifactTaskId = taskId;
+      const task = allLiveTasks.find(t => t.id === taskId);
+      currentArtifactList = (task && task.artifacts && task.artifacts.length > 0) ? task.artifacts : [artifactPath];
+
+      // Build tabs
+      const tabsContainer = document.getElementById('artifact-modal-tabs');
+      tabsContainer.innerHTML = '';
+      currentArtifactList.forEach(art => {
+        const fname = art.split('/').pop();
+        const isMd = fname.toLowerCase().endsWith('.md');
+        const tabBtn = document.createElement('button');
+        tabBtn.setAttribute('data-art-path', art);
+        tabBtn.className = `px-3 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 shrink-0 border ${
+          art === artifactPath
+            ? 'bg-purple-500 text-white font-bold border-purple-500 shadow-sm'
+            : 'bg-slate-200 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-white/5 hover:text-slate-900 dark:hover:text-white hover:border-purple-400/50'
+        }`;
+        tabBtn.innerHTML = `
+          <i class="${isMd ? 'fa-regular fa-file-lines' : 'fa-solid fa-file-code'} text-[10px]"></i>
+          <span>${fname}</span>
+        `;
+        tabBtn.onclick = () => loadArtifact(taskId, art);
+        tabsContainer.appendChild(tabBtn);
+      });
+
+      // Show modal
+      document.getElementById('artifact-modal').classList.remove('hidden');
+
+      // Load specific artifact
+      await loadArtifact(taskId, artifactPath);
+    }
+
+    async function loadArtifact(taskId, artifactPath) {
+      const loadingEl = document.getElementById('artifact-loading');
+      const errorEl = document.getElementById('artifact-error');
+      const renderedView = document.getElementById('artifact-rendered-view');
+      const rawContent = document.getElementById('artifact-raw-content');
+
+      loadingEl.classList.remove('hidden');
+      errorEl.classList.add('hidden');
+
+      // Update active tab styles
+      const tabs = document.querySelectorAll('#artifact-modal-tabs button');
+      tabs.forEach(btn => {
+        const p = btn.getAttribute('data-art-path');
+        if (p === artifactPath) {
+          btn.className = 'px-3 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 shrink-0 border bg-purple-500 text-white font-bold border-purple-500 shadow-sm';
+        } else {
+          btn.className = 'px-3 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 shrink-0 border bg-slate-200 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-white/5 hover:text-slate-900 dark:hover:text-white hover:border-purple-400/50';
+        }
+      });
+
+      try {
+        const url = `/api/artifact?task_id=${encodeURIComponent(taskId)}&path=${encodeURIComponent(artifactPath)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to load artifact');
+        }
+
+        currentArtifactData = data;
+
+        // Populate header
+        document.getElementById('artifact-modal-filename').innerText = data.filename;
+        document.getElementById('artifact-modal-task-badge').innerText = data.task_id || taskId;
+        document.getElementById('artifact-modal-size-badge').innerText = data.size_formatted;
+        document.getElementById('artifact-modal-time-badge').innerText = data.updated_at;
+        document.getElementById('artifact-modal-path').innerText = data.path;
+
+        const lineCount = data.content ? data.content.split('\n').length : 0;
+        document.getElementById('artifact-modal-footer-info').innerText = `Format: ${data.ext.toUpperCase()} | Lines: ${lineCount} | Size: ${data.size_formatted}`;
+
+        // Populate content
+        const isMarkdown = ['md', 'markdown', 'mdown'].includes(data.ext);
+        if (isMarkdown) {
+          renderedView.innerHTML = renderMarkdown(data.content);
+          postProcessCodeBlocks(renderedView);
+          setArtifactViewMode('preview');
+        } else {
+          setArtifactViewMode('raw');
+        }
+
+        rawContent.textContent = data.content;
+
+        loadingEl.classList.add('hidden');
+      } catch (err) {
+        console.error('Artifact load error:', err);
+        loadingEl.classList.add('hidden');
+        errorEl.classList.remove('hidden');
+        document.getElementById('artifact-error-msg').innerText = err.message;
+      }
+    }
+
+    function setArtifactViewMode(mode) {
+      currentArtifactViewMode = mode;
+      const previewBtn = document.getElementById('artifact-mode-preview');
+      const rawBtn = document.getElementById('artifact-mode-raw');
+      const renderedView = document.getElementById('artifact-rendered-view');
+      const rawView = document.getElementById('artifact-raw-view');
+
+      if (mode === 'preview') {
+        renderedView.classList.remove('hidden');
+        rawView.classList.add('hidden');
+        previewBtn.className = 'px-2.5 py-1 rounded-md text-purple-600 dark:text-purple-300 bg-white dark:bg-slate-900 font-bold shadow-sm transition-all flex items-center gap-1.5';
+        rawBtn.className = 'px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5';
+      } else {
+        renderedView.classList.add('hidden');
+        rawView.classList.remove('hidden');
+        rawBtn.className = 'px-2.5 py-1 rounded-md text-purple-600 dark:text-purple-300 bg-white dark:bg-slate-900 font-bold shadow-sm transition-all flex items-center gap-1.5';
+        previewBtn.className = 'px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5';
+      }
+    }
+
+    function closeArtifactModal() {
+      document.getElementById('artifact-modal').classList.add('hidden');
+      currentArtifactData = null;
+    }
+
+    function copyCurrentArtifactContent() {
+      if (!currentArtifactData || !currentArtifactData.content) return;
+      navigator.clipboard.writeText(currentArtifactData.content).then(() => {
+        const copyText = document.getElementById('artifact-copy-text');
+        const orig = copyText.innerText;
+        copyText.innerText = '복사됨!';
+        setTimeout(() => {
+          copyText.innerText = orig;
+        }, 1800);
+      }).catch(err => {
+        console.error('Copy failed:', err);
+      });
+    }
+
+    /* =====================================================================
+       5. SHARED KNOWLEDGE MEMORY & FORCE-DIRECTED 2D GRAPH (TACTICAL HUD)
+       ===================================================================== */
+    let graphCanvas, graphCtx;
+    let graphNodes = [];
+    let graphLinks = [];
+    let graphEdgeParticles = [];
+    let draggingGraphNode = null;
+    let hoveredGraphNode = null;
+
+    function initGraphEdgeParticles() {
+      if (!graphLinks || graphLinks.length === 0) return;
+      graphEdgeParticles = [];
+      const count = Math.min(64, graphLinks.length * 2);
+      for (let i = 0; i < count; i++) {
+        graphEdgeParticles.push({
+          linkIndex: Math.floor(Math.random() * graphLinks.length),
+          progress: Math.random(),
+          speed: 0.005 + Math.random() * 0.007
+        });
+      }
+    }
+
+    function initKnowledgeGraph() {
+      graphCanvas = document.getElementById('graph-canvas');
+      if (!graphCanvas) return;
+      graphCtx = graphCanvas.getContext('2d');
+      resizeGraphCanvas();
+
+      setupGraphCanvasEvents();
+      requestAnimationFrame(renderGraphLoop);
+    }
+
+    function resizeGraphCanvas() {
+      if (!graphCanvas) return;
+      const rect = graphCanvas.parentElement.getBoundingClientRect();
+      graphCanvas.width = rect.width;
+      graphCanvas.height = rect.height;
+    }
+
+    function getNodeRadius(node) {
+      if (!node) return 15;
+      const t = (node.type || 'concept').toLowerCase();
+      if (t === 'session') return 24;
+      if (t === 'agent') return 18;
+      if (t === 'task') return 16;
+      if (t === 'artifact') return 16;
+      return 15;
+    }
+
+    function setupGraphCanvasEvents() {
+      graphCanvas.addEventListener('mousedown', (e) => {
+        const rect = graphCanvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        for (let node of graphNodes) {
+          const dist = Math.hypot(node.x - mx, node.y - my);
+          if (dist < getNodeRadius(node) + 6) {
+            draggingGraphNode = node;
+            return;
+          }
+        }
+      });
+
+      graphCanvas.addEventListener('mousemove', (e) => {
+        const rect = graphCanvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        if (draggingGraphNode) {
+          draggingGraphNode.x = mx;
+          draggingGraphNode.y = my;
+          draggingGraphNode.vx = 0;
+          draggingGraphNode.vy = 0;
+        }
+
+        hoveredGraphNode = null;
+        for (let node of graphNodes) {
+          if (Math.hypot(node.x - mx, node.y - my) < getNodeRadius(node) + 6) {
+            hoveredGraphNode = node;
+            break;
+          }
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        draggingGraphNode = null;
+      });
+
+      graphCanvas.addEventListener('touchstart', (e) => {
+        if (!e.touches.length) return;
+        const rect = graphCanvas.getBoundingClientRect();
+        const mx = e.touches[0].clientX - rect.left;
+        const my = e.touches[0].clientY - rect.top;
+        for (let node of graphNodes) {
+          if (Math.hypot(node.x - mx, node.y - my) < getNodeRadius(node) + 8) {
+            draggingGraphNode = node;
+            break;
+          }
+        }
+      });
+
+      graphCanvas.addEventListener('touchmove', (e) => {
+        if (draggingGraphNode && e.touches.length) {
+          const rect = graphCanvas.getBoundingClientRect();
+          draggingGraphNode.x = e.touches[0].clientX - rect.left;
+          draggingGraphNode.y = e.touches[0].clientY - rect.top;
+        }
+      });
+
+      graphCanvas.addEventListener('touchend', () => { draggingGraphNode = null; });
+    }
+
+    function resetGraphPhysics() {
+      if (!graphCanvas) return;
+      const w = graphCanvas.width;
+      const h = graphCanvas.height;
+      graphNodes.forEach(n => {
+        n.x = w * 0.25 + Math.random() * (w * 0.5);
+        n.y = h * 0.25 + Math.random() * (h * 0.5);
+        n.vx = (Math.random() - 0.5) * 3;
+        n.vy = (Math.random() - 0.5) * 3;
+      });
+      initGraphEdgeParticles();
+      appendLog("GRAPH", "Knowledge Graph force physics re-centered and clustered.", "amber");
+    }
+
+    function updateGraphData(serverGraph) {
+      if (!serverGraph || !serverGraph.nodes || serverGraph.nodes.length === 0) return;
+      if (!graphCanvas) return;
+      const w = graphCanvas.width || 700;
+      const h = graphCanvas.height || 540;
+
+      const existing = new Map();
+      graphNodes.forEach(n => existing.set(n.id, n));
+
+      graphNodes = serverGraph.nodes.map(n => {
+        const old = existing.get(n.id);
+        if (old) {
+          return {
+            ...n,
+            x: old.x,
+            y: old.y,
+            vx: old.vx,
+            vy: old.vy
+          };
+        } else {
+          return {
+            ...n,
+            x: w * 0.25 + Math.random() * (w * 0.5),
+            y: h * 0.25 + Math.random() * (h * 0.5),
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2
+          };
+        }
+      });
+
+      graphLinks = serverGraph.links || [];
+      if (graphEdgeParticles.length === 0) {
+        initGraphEdgeParticles();
+      }
+    }
+
+    function renderGraphLoop() {
+      if (!graphCanvas || !graphCtx) return;
+      graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+      const isLight = currentTheme === 'light';
+      const w = graphCanvas.width;
+      const h = graphCanvas.height;
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+
+      // 1. Tactical Cyber Grid & Concentric Radar Rings Background
+      const step = 44;
+      graphCtx.fillStyle = isLight ? 'rgba(100, 116, 139, 0.12)' : 'rgba(148, 163, 184, 0.08)';
+      for (let gx = step; gx < w; gx += step) {
+        for (let gy = step; gy < h; gy += step) {
+          graphCtx.fillRect(gx - 1, gy - 1, 2, 2);
+        }
+      }
+
+      const ringRadii = [120, 240, 360, 480];
+      graphCtx.strokeStyle = isLight ? 'rgba(14, 165, 233, 0.07)' : 'rgba(56, 189, 248, 0.06)';
+      graphCtx.lineWidth = 1;
+      graphCtx.setLineDash([4, 6]);
+      ringRadii.forEach(r => {
+        graphCtx.beginPath();
+        graphCtx.arc(cx, cy, r, 0, Math.PI * 2);
+        graphCtx.stroke();
+      });
+      graphCtx.setLineDash([]);
+
+      const kRepel = 640;
+      const kLink = 0.035;
+      const desiredDist = 115;
+      const kCenter = 0.0016;
+
+      // 2. Center gravity & Node repulsion
+      for (let i = 0; i < graphNodes.length; i++) {
+        const n1 = graphNodes[i];
+
+        if (n1 !== draggingGraphNode) {
+          n1.vx += (cx - n1.x) * kCenter;
+          n1.vy += (cy - n1.y) * kCenter;
+        }
+
+        for (let j = i + 1; j < graphNodes.length; j++) {
+          const n2 = graphNodes[j];
+          let dx = n2.x - n1.x;
+          let dy = n2.y - n1.y;
+          let dist = Math.hypot(dx, dy) || 1;
+
+          if (dist < 280) {
+            let force = (kRepel / (dist * dist));
+            let fx = (dx / dist) * force;
+            let fy = (dy / dist) * force;
+
+            if (n1 !== draggingGraphNode) { n1.vx -= fx; n1.vy -= fy; }
+            if (n2 !== draggingGraphNode) { n2.vx += fx; n2.vy += fy; }
+          }
+        }
+      }
+
+      // 3. Link Attraction & Edge Rendering
+      graphLinks.forEach((link) => {
+        const source = graphNodes.find(n => n.id === link.source);
+        const target = graphNodes.find(n => n.id === link.target);
+        if (!source || !target) return;
+
+        let dx = target.x - source.x;
+        let dy = target.y - source.y;
+        let dist = Math.hypot(dx, dy) || 1;
+        let delta = dist - desiredDist;
+        let fx = (dx / dist) * delta * kLink;
+        let fy = (dy / dist) * delta * kLink;
+
+        if (source !== draggingGraphNode) { source.vx += fx; source.vy += fy; }
+        if (target !== draggingGraphNode) { target.vx -= fx; target.vy -= fy; }
+
+        const isConnectedToHover = hoveredGraphNode && (hoveredGraphNode.id === source.id || hoveredGraphNode.id === target.id);
+        const isDimmed = hoveredGraphNode && !isConnectedToHover;
+
+        graphCtx.save();
+        graphCtx.beginPath();
+        graphCtx.moveTo(source.x, source.y);
+        graphCtx.lineTo(target.x, target.y);
+
+        if (isConnectedToHover) {
+          graphCtx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.95)" : "rgba(56, 189, 248, 0.95)";
+          graphCtx.lineWidth = 2.4;
+          graphCtx.shadowColor = '#06b6d4';
+          graphCtx.shadowBlur = 8;
+        } else if (isDimmed) {
+          graphCtx.strokeStyle = isLight ? "rgba(100, 116, 139, 0.08)" : "rgba(255, 255, 255, 0.04)";
+          graphCtx.lineWidth = 0.8;
+        } else {
+          graphCtx.strokeStyle = isLight ? "rgba(100, 116, 139, 0.28)" : "rgba(255, 255, 255, 0.14)";
+          graphCtx.lineWidth = 1.0;
+        }
+        graphCtx.stroke();
+        graphCtx.restore();
+      });
+
+      // Flowing Edge Particles (Neural Synapses)
+      if (graphEdgeParticles.length > 0) {
+        graphEdgeParticles.forEach(ep => {
+          if (ep.linkIndex >= graphLinks.length) return;
+          const link = graphLinks[ep.linkIndex];
+          const source = graphNodes.find(n => n.id === link.source);
+          const target = graphNodes.find(n => n.id === link.target);
+          if (!source || !target) return;
+
+          ep.progress += ep.speed;
+          if (ep.progress >= 1) ep.progress = 0;
+
+          const epx = source.x + (target.x - source.x) * ep.progress;
+          const epy = source.y + (target.y - source.y) * ep.progress;
+
+          const isConnectedToHover = hoveredGraphNode && (hoveredGraphNode.id === source.id || hoveredGraphNode.id === target.id);
+          const pColor = isConnectedToHover ? '#38bdf8' : (source.color || '#06b6d4');
+
+          graphCtx.beginPath();
+          graphCtx.arc(epx, epy, isConnectedToHover ? 2.5 : 1.8, 0, Math.PI * 2);
+          graphCtx.fillStyle = pColor;
+          if (isConnectedToHover) {
+            graphCtx.shadowColor = pColor;
+            graphCtx.shadowBlur = 6;
+          }
+          graphCtx.fill();
+          graphCtx.shadowBlur = 0;
+        });
+      }
+
+      // 4. Position Updates & Node Rendering by Geometry (Enlarged Tactical Nodes)
+      graphNodes.forEach(node => {
+        const nr = getNodeRadius(node);
+
+        if (node !== draggingGraphNode) {
+          node.x += node.vx;
+          node.y += node.vy;
+          node.vx *= 0.86;
+          node.vy *= 0.86;
+
+          const pad = nr + 24;
+          if (node.x < pad) { node.x = pad; node.vx *= -0.5; }
+          if (node.x > w - pad) { node.x = w - pad; node.vx *= -0.5; }
+          if (node.y < pad) { node.y = pad; node.vy *= -0.5; }
+          if (node.y > h - pad) { node.y = h - pad; node.vy *= -0.5; }
+        }
+
+        const isHovered = (hoveredGraphNode === node || node === draggingGraphNode);
+        const isNeighbor = hoveredGraphNode && graphLinks.some(l => 
+          (l.source === hoveredGraphNode.id && l.target === node.id) ||
+          (l.target === hoveredGraphNode.id && l.source === node.id)
+        );
+        const isDimmed = hoveredGraphNode && !isHovered && !isNeighbor;
+
+        graphCtx.save();
+        if (isDimmed) {
+          graphCtx.globalAlpha = 0.22;
+        }
+
+        const nType = (node.type || 'concept').toLowerCase();
+        const nColor = node.color || '#06b6d4';
+
+        // Hover aura
+        if (isHovered || isNeighbor) {
+          graphCtx.beginPath();
+          graphCtx.arc(node.x, node.y, nr + 8, 0, Math.PI * 2);
+          graphCtx.fillStyle = nColor + "35";
+          graphCtx.fill();
+        }
+
+        if (nType === 'session') {
+          // 1. Session Central Reactor Core (Octagonal pulsating shield)
+          const rot = (Date.now() / 1500) % (Math.PI * 2);
+          graphCtx.save();
+          graphCtx.translate(node.x, node.y);
+          graphCtx.rotate(rot);
+          graphCtx.beginPath();
+          for (let s = 0; s < 8; s++) {
+            const sa = (s * Math.PI * 2) / 8;
+            const sx = Math.cos(sa) * (nr + 8);
+            const sy = Math.sin(sa) * (nr + 8);
+            if (s === 0) graphCtx.moveTo(sx, sy);
+            else graphCtx.lineTo(sx, sy);
+          }
+          graphCtx.closePath();
+          graphCtx.strokeStyle = nColor;
+          graphCtx.lineWidth = 2.2;
+          graphCtx.shadowColor = nColor;
+          graphCtx.shadowBlur = 12;
+          graphCtx.stroke();
+          graphCtx.restore();
+
+          // Core circle
+          graphCtx.beginPath();
+          graphCtx.arc(node.x, node.y, nr, 0, Math.PI * 2);
+          graphCtx.fillStyle = isLight ? '#ffffff' : '#083344';
+          graphCtx.fill();
+          graphCtx.strokeStyle = nColor;
+          graphCtx.lineWidth = 3;
+          graphCtx.shadowColor = nColor;
+          graphCtx.shadowBlur = 14;
+          graphCtx.stroke();
+
+          // Central pip
+          graphCtx.beginPath();
+          graphCtx.arc(node.x, node.y, 6, 0, Math.PI * 2);
+          graphCtx.fillStyle = nColor;
+          graphCtx.fill();
+
+        } else if (nType === 'agent') {
+          // 2. Agent Command Badge (Dual-ring disc)
+          graphCtx.beginPath();
+          graphCtx.arc(node.x, node.y, nr, 0, Math.PI * 2);
+          graphCtx.fillStyle = isLight ? '#ffffff' : '#0f172a';
+          graphCtx.fill();
+
+          graphCtx.strokeStyle = nColor;
+          graphCtx.lineWidth = 2.5;
+          graphCtx.shadowColor = nColor;
+          graphCtx.shadowBlur = isHovered ? 14 : 6;
+          graphCtx.stroke();
+
+          // Inner pip
+          graphCtx.beginPath();
+          graphCtx.arc(node.x, node.y, 5, 0, Math.PI * 2);
+          graphCtx.fillStyle = nColor;
+          graphCtx.fill();
+
+        } else if (nType === 'task') {
+          // 3. Task Sphere / Capsule
+          const isTaskActive = (node.label || '').includes('083');
+          if (isTaskActive) {
+            const pulseR = nr + 4 + Math.sin(Date.now() / 200) * 4;
+            graphCtx.beginPath();
+            graphCtx.arc(node.x, node.y, pulseR, 0, Math.PI * 2);
+            graphCtx.fillStyle = 'rgba(168, 85, 247, 0.35)';
+            graphCtx.fill();
+          }
+
+          graphCtx.beginPath();
+          graphCtx.arc(node.x, node.y, nr, 0, Math.PI * 2);
+          graphCtx.fillStyle = isLight ? '#f3e8ff' : '#3b0764';
+          graphCtx.fill();
+
+          graphCtx.strokeStyle = nColor;
+          graphCtx.lineWidth = isTaskActive ? 2.8 : 2;
+          graphCtx.shadowColor = nColor;
+          graphCtx.shadowBlur = isTaskActive ? 14 : 6;
+          graphCtx.stroke();
+
+        } else if (nType === 'artifact') {
+          // 4. Artifact Microchip (Chamfered Rectangle)
+          const cw = 34;
+          const ch = 24;
+          const cx_ = node.x - cw / 2;
+          const cy_ = node.y - ch / 2;
+
+          graphCtx.beginPath();
+          if (graphCtx.roundRect) {
+            graphCtx.roundRect(cx_, cy_, cw, ch, 4);
+          } else {
+            graphCtx.rect(cx_, cy_, cw, ch);
+          }
+          graphCtx.fillStyle = isLight ? '#ecfdf5' : '#064e3b';
+          graphCtx.fill();
+
+          graphCtx.strokeStyle = nColor;
+          graphCtx.lineWidth = 2;
+          graphCtx.shadowColor = nColor;
+          graphCtx.shadowBlur = 8;
+          graphCtx.stroke();
+
+        } else {
+          // 5. Symbol / Concept (Amber Diamond)
+          graphCtx.beginPath();
+          graphCtx.moveTo(node.x, node.y - nr);
+          graphCtx.lineTo(node.x + nr, node.y);
+          graphCtx.lineTo(node.x, node.y + nr);
+          graphCtx.lineTo(node.x - nr, node.y);
+          graphCtx.closePath();
+
+          graphCtx.fillStyle = isLight ? '#fffbeb' : '#451a03';
+          graphCtx.fill();
+
+          graphCtx.strokeStyle = nColor;
+          graphCtx.lineWidth = 2;
+          graphCtx.shadowColor = nColor;
+          graphCtx.shadowBlur = 8;
+          graphCtx.stroke();
+        }
+
+        // Label with crisp high-contrast pill backdrop
+        graphCtx.font = `${isHovered ? 'bold 11px' : 'bold 10px'} "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace`;
+        const lbl = node.label;
+        const tw = graphCtx.measureText(lbl).width;
+        const pillW = tw + 8;
+        const pillH = 14;
+        const pillX = node.x - pillW / 2;
+        const pillY = node.y + nr + 6;
+
+        graphCtx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.90)' : 'rgba(15, 23, 42, 0.90)';
+        graphCtx.strokeStyle = isHovered ? nColor : (isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)');
+        graphCtx.lineWidth = 1;
+        graphCtx.beginPath();
+        if (graphCtx.roundRect) graphCtx.roundRect(pillX, pillY, pillW, pillH, 3);
+        else graphCtx.rect(pillX, pillY, pillW, pillH);
+        graphCtx.fill();
+        graphCtx.stroke();
+
+        graphCtx.fillStyle = isLight ? '#0f172a' : '#f8fafc';
+        graphCtx.textAlign = 'center';
+        graphCtx.fillText(lbl, node.x, pillY + 10.5);
+
+        graphCtx.restore();
+      });
+
+      // 5. Hologram HUD Card on Hover
+      if (hoveredGraphNode) {
+        const node = hoveredGraphNode;
+        const connectedLinks = graphLinks.filter(l => l.source === node.id || l.target === node.id);
+        const relCount = connectedLinks.length;
+
+        const hudW = 240;
+        const hudH = 96;
+        let hudX = node.x + 24;
+        let hudY = node.y - 48;
+
+        if (hudX + hudW > w - 10) hudX = node.x - hudW - 24;
+        if (hudY < 10) hudY = 10;
+        if (hudY + hudH > h - 10) hudY = h - hudH - 10;
+
+        graphCtx.save();
+        graphCtx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(15, 23, 42, 0.95)';
+        graphCtx.strokeStyle = node.color || '#06b6d4';
+        graphCtx.lineWidth = 1.6;
+        graphCtx.shadowColor = node.color || '#06b6d4';
+        graphCtx.shadowBlur = 14;
+
+        graphCtx.beginPath();
+        if (graphCtx.roundRect) {
+          graphCtx.roundRect(hudX, hudY, hudW, hudH, 8);
+        } else {
+          graphCtx.rect(hudX, hudY, hudW, hudH);
+        }
+        graphCtx.fill();
+        graphCtx.stroke();
+
+        // Card Header
+        graphCtx.font = 'bold 10px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+        graphCtx.fillStyle = node.color || '#06b6d4';
+        graphCtx.textAlign = 'left';
+        graphCtx.fillText(`[${(node.type || 'NODE').toUpperCase()}]`, hudX + 12, hudY + 20);
+
+        graphCtx.font = 'bold 12px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+        graphCtx.fillStyle = isLight ? '#0f172a' : '#f8fafc';
+        const truncLabel = node.label.length > 18 ? node.label.slice(0, 16) + '..' : node.label;
+        graphCtx.fillText(truncLabel, hudX + 70, hudY + 20);
+
+        // Divider
+        graphCtx.strokeStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.1)';
+        graphCtx.lineWidth = 1;
+        graphCtx.beginPath();
+        graphCtx.moveTo(hudX + 8, hudY + 28);
+        graphCtx.lineTo(hudX + hudW - 8, hudY + 28);
+        graphCtx.stroke();
+
+        // Relations summary
+        graphCtx.font = '10px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+        graphCtx.fillStyle = isLight ? '#475569' : '#94a3b8';
+        graphCtx.fillText(`Connected Relations: ${relCount}`, hudX + 12, hudY + 46);
+
+        // Preview up to 2 relations
+        const previewRels = connectedLinks.slice(0, 2).map(l => {
+          const isOut = l.source === node.id;
+          const other = isOut ? l.target : l.source;
+          return `${isOut ? '→' : '←'} ${l.type} (${other})`;
+        });
+        previewRels.forEach((relStr, idx) => {
+          const shortRel = relStr.length > 29 ? relStr.slice(0, 27) + '..' : relStr;
+          graphCtx.fillStyle = isLight ? '#0284c7' : '#38bdf8';
+          graphCtx.font = '9.5px "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace';
+          graphCtx.fillText(shortRel, hudX + 12, hudY + 62 + idx * 15);
+        });
+
+        graphCtx.restore();
+      }
+
+      requestAnimationFrame(renderGraphLoop);
+    }
+
+    async function fetchMemory() {
+      try {
+        const res = await fetch('/api/memory');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // 1. Badges
+        const totalChunks = (data.total_chunks || 0).toLocaleString();
+        const totalRels = (data.total_relations || 0).toLocaleString();
+        document.getElementById('memory-total-badge').innerText = `${totalChunks} Indexed`;
+        const graphBadge = document.getElementById('graph-memory-badge');
+        if (graphBadge) graphBadge.innerText = `${totalRels} RELATIONS`;
+
+        // 1.5 Agent Memory Query Audit
+        const accessStats = data.access_stats || {};
+        const totalQ = accessStats.total_queries || 0;
+        const byAgent = accessStats.by_agent || [];
+        const kpiQueriesEl = document.getElementById('kpi-memory-queries');
+        const kpiAgentsEl = document.getElementById('kpi-memory-audit-agents');
+        if (kpiQueriesEl) kpiQueriesEl.innerText = `${totalQ.toLocaleString()} queries`;
+        if (kpiAgentsEl) {
+          if (byAgent.length > 0) {
+            const summary = byAgent.slice(0, 3).map(a => `@${escapeHtml(a.agent)}(${a.count})`).join(' · ');
+            kpiAgentsEl.innerHTML = `조회 감사: <strong class="text-cyan-700 dark:text-cyan-300 font-mono font-semibold">${summary}</strong>`;
+          } else {
+            kpiAgentsEl.innerHTML = `SQLite memory.db: <strong class="text-emerald-700 dark:text-emerald-300 font-semibold">task_chunks FTS5</strong>`;
+          }
+        }
+        const queryTotalEl = document.getElementById('memory-query-total');
+        const agentBadgesEl = document.getElementById('memory-agent-badges');
+        if (queryTotalEl && agentBadgesEl) {
+          queryTotalEl.innerText = `${totalQ.toLocaleString()} queries`;
+          const recentQ = accessStats.recent_queries || [];
+          const auditHash = `${totalQ}|` + byAgent.map(a => `${a.agent}:${a.count}`).join(',');
+          if (agentBadgesEl.dataset.lastHash !== auditHash) {
+            agentBadgesEl.dataset.lastHash = auditHash;
+            if (byAgent.length === 0) {
+              agentBadgesEl.innerHTML = `<span class="text-slate-400">기록된 조회 이력 없음 (--agent 지정 시 자동 추적)</span>`;
+            } else {
+              const latestByAgent = {};
+              recentQ.forEach(q => {
+                if (!latestByAgent[q.agent]) latestByAgent[q.agent] = q;
+              });
+              agentBadgesEl.innerHTML = byAgent.map(a => {
+                const lastQ = latestByAgent[a.agent];
+                const tip = lastQ ? `최근: "${lastQ.query}" (${lastQ.result_count}건)` : (a.last_at || '');
+                return `<span title="${escapeHtml(tip)}" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyan-50 dark:bg-cyan-950/40 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/20">
+                  <span class="font-bold">@${escapeHtml(a.agent)}</span>
+                  <span class="text-slate-500 dark:text-slate-400">${a.count}</span>
+                </span>`;
+              }).join('');
+            }
+          }
+        }
+
+        // 2. Update Vector Stream
+        const container = document.getElementById('vector-stream-list');
+        const hash = (data.recent_chunks || []).map(c => `${c.task_id}-${c.header}`).join('|');
+        if (container.dataset.lastHash !== hash) {
+          container.dataset.lastHash = hash;
+          container.innerHTML = '';
+
+          if (!data.recent_chunks || data.recent_chunks.length === 0) {
+            container.innerHTML = `<div class="text-xs text-slate-500 font-mono py-2">인덱싱된 지식이 없습니다.</div>`;
+          } else {
+            data.recent_chunks.slice(0, 10).forEach(c => {
+              const item = document.createElement('div');
+              item.className = "p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 font-mono text-xs space-y-0.5 hover:border-emerald-500/40 transition-colors";
+              item.innerHTML = `
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-emerald-600 dark:text-emerald-400 font-bold">${escapeHtml(c.task_id)}</span>
+                  <span class="text-slate-400 truncate max-w-[140px]">${escapeHtml(c.header)}</span>
+                </div>
+                <div class="text-[11px] text-slate-600 dark:text-slate-300 truncate">
+                  ${escapeHtml(c.preview)}
+                </div>
+              `;
+              container.appendChild(item);
+            });
+          }
+        }
+
+        // 3. Update Force-Directed 2D Graph
+        if (data.graph) {
+          updateGraphData(data.graph);
+        }
+      } catch (err) {
+        console.warn('Memory fetch error:', err);
+      }
+    }
+
+    /* =====================================================================
+       6. CONTROLLER INTERACTIVE COMMAND CONSOLE DRAWER & MARKDOWN RENDERING
+       ===================================================================== */
+    let controllerChatOpen = false;
+
+    function renderMarkdown(content) {
+      if (!content) return '';
+      if (typeof marked !== 'undefined') {
+        try {
+          marked.use({
+            gfm: true,
+            breaks: true
+          });
+          let rawHtml = marked.parse(content);
+          // Rewrite local filesystem image paths (file:///..., /home/..., /tmp/...) to /api/image proxy
+          rawHtml = rawHtml.replace(/(<img\b[^>]*\bsrc=["'])(file:\/\/\/[^"']+|\/(?:home|tmp|Users|var)\/[^"']+)(["'][^>]*>)/gi, (m, prefix, src, suffix) => {
+            return prefix + '/api/image?path=' + encodeURIComponent(src) + suffix;
+          });
+          return typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(rawHtml) : rawHtml;
+        } catch (e) {
+          console.warn('Markdown parse error:', e);
+        }
+      }
+      return escapeHtml(content);
+    }
+
+    function postProcessCodeBlocks(container) {
+      if (!container) return;
+      if (typeof hljs !== 'undefined') {
+        container.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightElement(block);
+        });
+      }
+
+      container.querySelectorAll('pre').forEach((pre) => {
+        if (pre.querySelector('.copy-code-btn')) return;
+        const btn = document.createElement('button');
+        btn.className = 'copy-code-btn';
+        btn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i>Copy';
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const codeEl = pre.querySelector('code');
+          const codeText = codeEl ? codeEl.innerText : pre.innerText;
+          navigator.clipboard.writeText(codeText).then(() => {
+            btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400 mr-1"></i>Copied!';
+            setTimeout(() => {
+              btn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i>Copy';
+            }, 1800);
+          });
+        };
+        pre.appendChild(btn);
+      });
+
+      // Enhance rendered images with clean styling, lazy loading & click-to-zoom lightbox
+      container.querySelectorAll('img').forEach((img) => {
+        if (img.dataset.zoomBound) return;
+        img.dataset.zoomBound = 'true';
+        img.className = 'my-2 rounded-xl border border-slate-300 dark:border-white/15 shadow-md max-w-full max-h-[320px] object-contain cursor-zoom-in hover:border-cyan-400 transition-all bg-slate-900/30';
+        img.loading = 'lazy';
+        img.onclick = (e) => {
+          e.stopPropagation();
+          openImageLightbox(img.src, img.alt || 'Screenshot Preview');
+        };
+      });
+    }
+
+    function openImageLightbox(src, caption = '') {
+      const modal = document.getElementById('image-lightbox-modal');
+      const imgEl = document.getElementById('lightbox-img');
+      const capEl = document.getElementById('lightbox-caption');
+      if (!modal || !imgEl) return;
+      imgEl.src = src;
+      imgEl.alt = caption;
+      if (capEl) capEl.innerText = caption || 'Screenshot';
+      modal.classList.remove('hidden');
+    }
+
+    function closeImageLightbox() {
+      const modal = document.getElementById('image-lightbox-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function toggleControllerChat() {
+      controllerChatOpen = !controllerChatOpen;
+      const drawer = document.getElementById('controller-drawer');
+      const trigger = document.getElementById('floating-chat-trigger');
+
+      if (controllerChatOpen) {
+        drawer.classList.remove('translate-x-full');
+        trigger.classList.add('opacity-0', 'pointer-events-none');
+        document.getElementById('chat-input').focus();
+        fetchControllerHistory();
+      } else {
+        drawer.classList.add('translate-x-full');
+        trigger.classList.remove('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function clearChatMessages() {
+      const box = document.getElementById('chat-messages');
+      box.innerHTML = `
+        <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-300 space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info"></i> Herdr Controller IPC Connected
+          </div>
+          <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+            대화 화면이 초기화되었습니다. Controller 에이전트에게 새 명령을 전달하거나, 상단 새로고침 버튼으로 과거 대화 내역을 다시 불러올 수 있습니다.
+          </p>
+        </div>
+      `;
+      appendLog("CONTROLLER", "Dialogue console cleared by operator.", "cyan");
+    }
+
+    function sendQuickDirective(text) {
+      if (!controllerChatOpen) toggleControllerChat();
+      document.getElementById('chat-input').value = text;
+      handleChatSubmit(new Event('submit'));
+    }
+
+    async function handleChatSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendUserMessage(text);
+      input.value = '';
+
+      showTypingIndicator();
+
+      try {
+        const res = await fetch('/api/controller/prompt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: text })
+        });
+        const data = await res.json();
+        appendLog("OPERATOR", `Prompt sent to Controller: "${text}"`, "emerald");
+
+        // Controller -> Planner 워크플로우 활성화 및 패킷 발사 애니메이션
+        spawnPacket('controller', 'planner', 'DISPATCH', 'DIRECTIVE', '#06b6d4');
+        userDirectiveWorkflows.push({
+          id: `cmd-${Date.now()}`,
+          src: 'controller',
+          dst: 'planner',
+          taskId: 'CMD_DIRECTIVE',
+          label: 'DISPATCH',
+          type: 'DIRECTIVE',
+          color: '#06b6d4',
+          timestamp: Date.now()
+        });
+
+        // 상태 폴링 시작 (Controller 응답 완료 감지)
+        pollControllerResponse();
+      } catch (err) {
+        hideTypingIndicator();
+        appendControllerMessage("오류: Controller 통신에 실패했습니다. Herdr 세션 상태를 확인해 주세요.");
+      }
+    }
+
+    function appendUserMessage(text, timestamp = null) {
+      const box = document.getElementById('chat-messages');
+      const timeStr = timestamp || new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = "flex items-start justify-end gap-2.5";
+      const renderedContent = renderMarkdown(text);
+
+      div.innerHTML = `
+        <div class="space-y-1 max-w-[85%] text-right">
+          <div class="flex items-center justify-end gap-2">
+            <span class="text-slate-500 text-[9px] font-mono">${timeStr}</span>
+            <span class="text-emerald-600 dark:text-emerald-400 font-bold text-[11px] font-mono">OPERATOR</span>
+          </div>
+          <div class="p-3 rounded-2xl rounded-tr-none bg-emerald-600 text-white shadow-md text-left text-xs leading-relaxed markdown-content select-text">
+            ${renderedContent}
+          </div>
+        </div>
+      `;
+      box.appendChild(div);
+      postProcessCodeBlocks(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function appendControllerMessage(text, thought = "", timestamp = null) {
+      const box = document.getElementById('chat-messages');
+      const timeStr = timestamp || new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = "flex items-start gap-2.5";
+
+      let thoughtHtml = "";
+      if (thought && thought.trim()) {
+        const cleanThought = renderMarkdown(thought.trim());
+        thoughtHtml = `
+          <details class="thought-accordion group bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-500/25 rounded-xl p-2.5 text-xs font-mono transition-all">
+            <summary class="flex items-center justify-between text-cyan-700 dark:text-cyan-400 font-semibold cursor-pointer select-none">
+              <span class="flex items-center gap-1.5 text-[11px]">
+                <i class="fa-solid fa-brain text-cyan-500 dark:text-cyan-400"></i>
+                <span>Thought Process (AI 추론 과정)</span>
+              </span>
+              <i class="fa-solid fa-chevron-right text-[10px] text-cyan-500 transition-transform thought-chevron"></i>
+            </summary>
+            <div class="mt-2.5 pt-2 border-t border-cyan-200 dark:border-cyan-500/20 text-slate-700 dark:text-slate-300 markdown-content text-[11px] leading-relaxed max-h-64 overflow-y-auto pr-1">
+              ${cleanThought}
+            </div>
+          </details>
+        `;
+      }
+
+      const renderedContent = renderMarkdown(text);
+
+      div.innerHTML = `
+        <div class="w-7 h-7 rounded-lg bg-cyan-600/20 border border-cyan-500/40 text-cyan-500 dark:text-cyan-400 flex items-center justify-center text-xs flex-shrink-0 mt-1">
+          <i class="fa-solid fa-sitemap"></i>
+        </div>
+        <div class="space-y-2 max-w-[90%] w-full">
+          <div class="flex items-center gap-2">
+            <span class="text-cyan-600 dark:text-cyan-400 font-bold text-[11px] font-mono">@controller</span>
+            <span class="text-slate-500 text-[9px] font-mono">${timeStr}</span>
+          </div>
+          ${thoughtHtml}
+          <div class="p-3.5 rounded-2xl rounded-tl-none bg-slate-100 dark:bg-slate-800/95 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-100 shadow-md leading-relaxed markdown-content select-text">
+            ${renderedContent}
+          </div>
+        </div>
+      `;
+
+      box.appendChild(div);
+      postProcessCodeBlocks(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+      hideTypingIndicator();
+      const box = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.id = 'typing-indicator';
+      div.className = "flex items-center gap-2 text-cyan-600 dark:text-cyan-300 text-xs font-mono pl-9 py-2";
+      div.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-cyan-500 live-indicator"></span>
+        <span>@controller가 지시를 분석하고 스웜 에이전트들에게 오케스트레이션 중입니다...</span>
+      `;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+      const el = document.getElementById('typing-indicator');
+      if (el) el.remove();
+    }
+
+    async function pollControllerResponse() {
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        try {
+          const res = await fetch('/api/controller/history');
+          const data = await res.json();
+          const latest = data.history && data.history.length > 0 ? data.history[data.history.length - 1] : null;
+
+          if (latest && latest.status === 'DONE') {
+            clearInterval(interval);
+            hideTypingIndicator();
+            await fetchControllerHistory();
+            triggerManualSync();
+            return;
+          }
+        } catch (e) {}
+
+        if (attempts > 90) { // 3분 타임아웃
+          clearInterval(interval);
+          hideTypingIndicator();
+          appendControllerMessage("지시가 Controller 세션에 전달되었습니다. 터미널에서 계속 진행 중입니다.");
+        }
+      }, 2000);
+    }
+
+    async function fetchControllerHistory() {
+      try {
+        const res = await fetch('/api/controller/history');
+        const data = await res.json();
+        if (data.history && data.history.length > 0) {
+          const box = document.getElementById('chat-messages');
+          box.innerHTML = `
+            <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-300 space-y-1">
+              <div class="font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info"></i> Herdr Controller IPC Connected
+              </div>
+              <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                Controller 에이전트와 직접 상호작용합니다. 마크다운 표, 코드 블록, AI 생각(Thought) 프로세스가 실시간 렌더링됩니다.
+              </p>
+            </div>
+          `;
+          data.history.forEach(h => {
+            if (h.operator_prompt) {
+              appendUserMessage(h.operator_prompt, h.timestamp);
+            }
+            if (h.status === 'WORKING') {
+              showTypingIndicator();
+            } else if (h.response || h.thought) {
+              appendControllerMessage(h.response, h.thought, h.timestamp);
+            }
+          });
+          box.scrollTop = box.scrollHeight;
+        }
+      } catch (e) {
+        console.warn('Error fetching controller history:', e);
+      }
+    }
+
+    /* =====================================================================
+       7. AGENT LIVE TERMINAL MODAL INSPECTOR
+       ===================================================================== */
+    async function openAgentModal(roleId) {
+      const agent = liveAgents.find(a => a.id === roleId);
+      if (!agent) return;
+      activeModalAgent = agent;
+
+      document.getElementById('modal-agent-name').innerText = agent.name;
+      document.getElementById('modal-agent-role').innerText = agent.role;
+      document.getElementById('modal-agent-tab').innerText = `${agent.tab} (${agent.pane_id})`;
+      document.getElementById('modal-agent-model').innerText = agent.model;
+      document.getElementById('modal-agent-cli').innerText = agent.cli || 'agy';
+      document.getElementById('modal-agent-tokens').innerText = agent.metrics || 'Ready';
+
+      const badge = document.getElementById('modal-agent-status-badge');
+      badge.innerText = agent.status;
+      badge.className = `text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+        agent.status === 'WORKING' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'
+      }`;
+
+      document.getElementById('modal-agent-avatar').innerHTML = `<i class="fa-solid ${agent.icon}"></i>`;
+      document.getElementById('modal-terminal-output').innerText = '터미널 실시간 출력 로딩 중...';
+
+      document.getElementById('agent-modal').classList.remove('hidden');
+
+      await refreshModalTerminal();
+
+      // Start 1s modal interval
+      if (modalRefreshTimer) clearInterval(modalRefreshTimer);
+      modalRefreshTimer = setInterval(() => {
+        if (document.getElementById('modal-auto-refresh').checked) {
+          refreshModalTerminal();
+        }
+      }, 1200);
+    }
+
+    async function refreshModalTerminal() {
+      if (!activeModalAgent) return;
+      try {
+        const res = await fetch(`/api/agent/${activeModalAgent.id}/terminal?lines=100`);
+        const data = await res.json();
+        const outputEl = document.getElementById('modal-terminal-output');
+        outputEl.innerText = data.output || '터미널 출력이 없습니다.';
+        outputEl.scrollTop = outputEl.scrollHeight;
+      } catch (e) {
+        document.getElementById('modal-terminal-output').innerText = '터미널 출력을 읽어올 수 없습니다.';
+      }
+    }
+
+    function closeAgentModal() {
+      document.getElementById('agent-modal').classList.add('hidden');
+      activeModalAgent = null;
+      if (modalRefreshTimer) {
+        clearInterval(modalRefreshTimer);
+        modalRefreshTimer = null;
+      }
+    }
+
+    function copyTerminalText() {
+      const text = document.getElementById('modal-terminal-output').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('터미널 출력이 클립보드에 복사되었습니다.');
+      });
+    }
+
+    /* =====================================================================
+       8. PROJECT SWITCHING & UTILITY
+       ===================================================================== */
+    async function handleProjectSwitch(projName) {
+      if (!confirm(`활성 프로젝트를 [${projName}] 로 전환하시겠습니까? 에이전트 세션 스냅샷이 자동 보존됩니다.`)) {
+        return;
+      }
+      appendLog("SYSTEM", `Switching active project to [${projName}]...`, "purple");
+      try {
+        const res = await fetch('/api/project/switch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project: projName })
+        });
+        const data = await res.json();
+        appendLog("SYSTEM", data.message, "purple");
+        setTimeout(triggerManualSync, 2000);
+      } catch (e) {
+        alert('프로젝트 전환 실패: ' + e);
+      }
+    }
+
+    function toggleLiveRefresh() {
+      liveRefreshActive = !liveRefreshActive;
+      const icon = document.getElementById('sim-icon');
+      const text = document.getElementById('sim-text');
+
+      if (liveRefreshActive) {
+        icon.className = "fa-solid fa-play text-emerald-500";
+        text.innerText = "LIVE TICK";
+        startLiveRefreshTimer();
+        appendLog("SYSTEM", "Live Tick polling resumed (2s interval)", "emerald");
+      } else {
+        icon.className = "fa-solid fa-pause text-amber-500";
+        text.innerText = "PAUSED";
+        if (liveRefreshTimer) clearInterval(liveRefreshTimer);
+        appendLog("SYSTEM", "Live Tick polling paused by operator", "amber");
+      }
+    }
+
+    function startLiveRefreshTimer() {
+      if (liveRefreshTimer) clearInterval(liveRefreshTimer);
+      liveRefreshTimer = setInterval(async () => {
+        if (!liveRefreshActive) return;
+        await Promise.all([fetchSwarmStatus(), fetchAgents(), fetchTasks(), fetchMemory()]);
+      }, 2000);
+    }
+
+    async function triggerManualSync() {
+      const icon = document.getElementById('sync-icon');
+      icon.classList.add('fa-spin');
+      await Promise.all([fetchSwarmStatus(), fetchAgents(), fetchTasks(), fetchMemory()]);
+      setTimeout(() => icon.classList.remove('fa-spin'), 600);
+      appendLog("SYNC", "Manual sync completed across 8 agents & SQLite memory", "cyan");
+    }
+
+    function appendLog(tag, msg, color = "slate") {
+      const box = document.getElementById('terminal-stdout');
+      if (!box) return;
+      const timeStr = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = "flex items-start gap-2 text-[11px] leading-tight";
+      div.innerHTML = `
+        <span class="text-slate-500 flex-shrink-0">[${timeStr}]</span>
+        <span class="text-${color}-400 font-bold flex-shrink-0">&lt;${tag}&gt;</span>
+        <span class="text-slate-200 select-text">${escapeHtml(msg)}</span>
+      `;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function clearActivityLogs() {
+      document.getElementById('terminal-stdout').innerHTML = '';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* =====================================================================
+       9. INITIALIZATION
+       ===================================================================== */
+    window.addEventListener('DOMContentLoaded', async () => {
+      resizeCanvas();
+      initKnowledgeGraph();
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        resizeGraphCanvas();
+      });
+      requestAnimationFrame(renderTopology);
+
+      // Initial data fetch
+      await Promise.all([fetchSwarmStatus(), fetchAgents(), fetchTasks(), fetchMemory(), fetchControllerHistory()]);
+
+      // Start live refresh
+      startLiveRefreshTimer();
+
+      // Workflow-directed transmission packet loop (진행 중인 태스크/지시 관계 동안만 패킷 송수신)
+      setInterval(() => {
+        if (!liveRefreshActive) return;
+        transmitActiveWorkflowPackets();
+      }, 1800);
+
+      appendLog("SWARM", "Swarm Command Deck successfully connected to Herdr session 'Dev'", "cyan");
+    });
+  </script>
+</body>
+</html>
