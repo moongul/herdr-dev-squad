@@ -4,7 +4,11 @@
 
 A **multi-agent software engineering workspace** built on top of [`herdr`](https://github.com/herdr-ai/herdr), combining **8 specialized AI agent roles**, a **SQLite Vector + FTS5 + Knowledge Graph RAG memory**, an **interactive `F12` Team Hub TUI**, and a **real-time Web Command Deck**.
 
+### Web Command Deck (`dev web`)
 ![Herdr Swarm Command Deck WebUI Demo](docs/assets/webui-demo.gif)
+
+### Herdr 4×2 Multi-Pane & `F12` Team Hub Popup (`dev start`)
+![Herdr TUI Multi-Pane and F12 Team Hub Demo](docs/assets/herdr-tui-demo.gif)
 
 ---
 

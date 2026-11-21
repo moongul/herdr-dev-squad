@@ -5,7 +5,11 @@
 [`herdr`](https://github.com/herdr-ai/herdr) 기반의 **8인 전문 AI 에이전트 멀티 프로젝트 개발 워크스페이스**입니다.  
 **SQLite 벡터 + FTS5 + 지식 그래프 RAG 메모리(`memory.db`)**, **`F12` 대화형 Team Hub TUI**, **실시간 Web Command Deck**을 하나의 워크플로우로 통합했습니다.
 
+### 실시간 Web Command Deck (`dev web`)
 ![Herdr Swarm Command Deck WebUI Demo](docs/assets/webui-demo.gif)
+
+### Herdr 4×2 멀티 패인 & `F12` Team Hub 팝업 (`dev start`)
+![Herdr TUI Multi-Pane and F12 Team Hub Demo](docs/assets/herdr-tui-demo.gif)
 
 ---
 
